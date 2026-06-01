@@ -1,0 +1,16 @@
+
+.quiz-select-dark {
+  appearance: none;
+  background-color: #1a0b2e; 
+  color: #e9d5ff; 
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 10px 15px;
+  border-radius: 12px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.quiz-select-dark option {
+  background-color: #1a0b2e;
+  color: #e9d5ff;
+}
