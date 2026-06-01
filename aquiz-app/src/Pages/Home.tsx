@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Home.css';
+import { User } from '../quiz';
 import AuthModal from './AuthModal';
 import API_BASE_URL from './config';
 
@@ -8,8 +9,8 @@ const Home = () => {
   const navigate = useNavigate();
   const [showAllCategories, setShowAllCategories] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user'))?.username || null);
-const [topUsers, setTopUsers] = useState([]);
+const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || '{}')?.username || null);
+const [topUsers, setTopUsers] = useState<User[]>([]);
 
 useEffect(() => {
   const fetchTopScorers = async () => {
@@ -110,7 +111,7 @@ useEffect(() => {
   <div 
     key={i} 
     className="flex flex-col items-center gap-3 mb-6 group cursor-pointer"
-    onClick={() => navigate('/leaderboard', { state: { initialCategory: cat.id } })} 
+    onClick={() => navigate('/leaderboard', { state: { initialCategory: cat.label} })} 
   >
     <div className="w-20 h-20 rounded-3xl bg-white/5 backdrop-blur-xl flex items-center justify-center text-electric-violet group-hover:bg-electric-violet/20 transition-all">
       <span className="material-symbols-outlined !text-[40px]">{cat.icon}</span>

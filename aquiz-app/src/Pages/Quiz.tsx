@@ -3,15 +3,18 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import API_BASE_URL from './config'; 
 import './Quiz.css';
 import confetti from 'canvas-confetti';
-
-
 import Higuruma from '../assets/Higuruma.png';
 import Hesnotreading from '../assets/Not-reading.png';
 import Regret from '../assets/Regret.png';
 import doesheknow from '../assets/doesheknow.png';
 import speed from '../assets/speed.jpg';
+interface QuizProps{
+category: string;
+amount: number;
+difficulty: string;
+}
 
-const Quiz = ({ category, amount, difficulty }) => {
+const Quiz = ({ category, amount, difficulty }: QuizProps) => {
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -48,7 +51,7 @@ const Quiz = ({ category, amount, difficulty }) => {
     const option_array = [Option1, Option2, Option3, Option4];
 
     const submitFinalScore = async () => {
-        const user = JSON.parse(localStorage.getItem('user'));
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
     
     const payload = {
         userId: user?.id || user?._id || null, 

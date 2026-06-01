@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API_BASE_URL from './config';
+import { Quiz } from '../quiz';
 
 const MyQuizzes = () => {
-    const [quizzes, setQuizzes] = useState([]);
+    const [quizzes, setQuizzes] = useState<Quiz[]>([]);;
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const [generatedCode, setGeneratedCode] = useState(null);
     
-    const user = JSON.parse(localStorage.getItem('user'));
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
     const userId = user?.id || user?._id;
     
      const copyToClipboard = () => {
-    navigator.clipboard.writeText(generatedCode);
+    if (generatedCode) {
+        navigator.clipboard.writeText(generatedCode);
+    }
   };
 
     useEffect(() => {
@@ -38,7 +42,7 @@ const MyQuizzes = () => {
         }
     };
 
-    const handleDelete = async (id) => {
+    const handleDelete = async (id : number) => {
         if (window.confirm("Are you sure you want to delete this quiz?")) {
             try {
                 const res = await fetch(`${API_BASE_URL}/api/quizzes/${id}`, { 

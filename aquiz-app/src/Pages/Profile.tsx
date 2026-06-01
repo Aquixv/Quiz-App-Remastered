@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import API_BASE_URL from './config';
 import './Profile.css'
+import { User } from '../quiz';
+import { Score } from '../quiz';
 
 const Profile = () => {
   const navigate = useNavigate();
-  const [userData, setUserData] = useState(null);
-  const localUser = JSON.parse(localStorage.getItem('user'));
-  const [history, setHistory] = useState([]);
+  const [userData, setUserData] = useState<User | null>(null);
+  const localUser = JSON.parse(localStorage.getItem('user') || '{}');
+  const [history, setHistory] = useState<Score[]>([]);
 
 useEffect(() => {
     if (localUser) {
@@ -17,7 +19,7 @@ useEffect(() => {
     }
 }, []);
   
-  const getPlayerRankInfo = (points) => {
+  const getPlayerRankInfo = (points: number) => {
   if (points >= 50000) return { title: "Grandmaster", color: "text-neon-yellow", icon: "military_tech" };
   if (points >= 25000) return { title: "Elite Scholar", color: "text-electric-violet", icon: "workspace_premium" };
   if (points >= 10000) return { title: "Brainiac", color: "text-lavender-light", icon: "psychology" };

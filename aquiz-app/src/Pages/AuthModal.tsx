@@ -1,15 +1,20 @@
+interface AuthModalProps {
+  isOpen: boolean;
+  onClose: () => void; 
+  onAuthSuccess: (username: string) => void; 
+}
 import React, { useState } from 'react';
-import API_BASE_URL from './config'
+import API_BASE_URL from './config';
 
-const AuthModal = ({ isOpen, onClose, onAuthSuccess }) => {
+const AuthModal = ({ isOpen, onClose, onAuthSuccess }: AuthModalProps) => {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
+   if (e) e.preventDefault();
     setError('');
     const endpoint = isLogin ? '/api/login' : '/api/signup';
     

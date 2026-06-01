@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API_BASE_URL from './config';
-
+import { Question, Quiz, User } from '../quiz';
 const CreateQuiz = () => {
   const navigate = useNavigate();
   const [quizTitle, setQuizTitle] = useState('');
@@ -14,13 +14,13 @@ const CreateQuiz = () => {
     setQuestions([...questions, { questionText: '', correctAnswer: '', incorrectAnswers: ['', '', ''] }]);
   };
 
-  const deleteQuestion = (index) => {
+  const deleteQuestion = (index: number) => {
     if (questions.length === 1) return; 
     const updated = questions.filter((_, i) => i !== index);
     setQuestions(updated);
   };
 
-const user = JSON.parse(localStorage.getItem('user'));
+const user = JSON.parse(localStorage.getItem('user') || '{}');
 const quizData = {
     quizTitle: quizTitle,
     questions: questions,
@@ -28,18 +28,17 @@ const quizData = {
     creatorId: user.id || user._id 
 };
 
-  const handleInputChange = (index, field, value, subIndex = null) => {
+const handleInputChange = (
+    index: number, 
+    field: keyof Question, 
+    value: string, 
+    subIndex: number | null = null
+  ) => {
     const updatedQuestions = [...questions];
-    if (subIndex !== null) {
-      updatedQuestions[index].incorrectAnswers[subIndex] = value;
-    } else {
-      updatedQuestions[index][field] = value;
-    }
-    setQuestions(updatedQuestions);
-  };
+  }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
+   if (e) e.preventDefault();
     try {
       const response = await fetch(`${API_BASE_URL}/api/quizzes`, {
     method: 'POST',
@@ -55,8 +54,10 @@ const quizData = {
     }
   };
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(generatedCode);
+const copyToClipboard = () => {
+    if (generatedCode) {
+        navigator.clipboard.writeText(generatedCode);
+    }
   };
 
   if (generatedCode) {

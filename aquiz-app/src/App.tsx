@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
-import Home from './Pages/Home'
+import Home from './Pages/Home';
 import Setup from './Pages/Setup'
-import Quiz from './Pages/Quiz'
+import Quiz from './Pages/Quiz';
 import CreateQuiz from './Pages/createQuiz';
 import Leaderboard from './Pages/Leaderboard';
 import Profile from './Pages/Profile';

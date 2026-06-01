@@ -3,13 +3,13 @@ import { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import './Leaderboard.css'
 import API_BASE_URL from './config';
-
+import { Question, Quiz, User } from '../quiz';
 const Leaderboard = () => {
 
 const location = useLocation();
 const [currentCategory, setCurrentCategory] = useState(location.state?.initialCategory || '9');
-const [scores, setScores] = useState([]);
- const [apiCategories, setApiCategories] = useState([]);
+const [scores, setScores] = useState<User[]>([]);
+ const [apiCategories, setApiCategories] = useState<Quiz[]>([]);
   
 
 useEffect(() => {
