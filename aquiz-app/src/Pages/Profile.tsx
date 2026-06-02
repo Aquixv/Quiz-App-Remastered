@@ -8,12 +8,15 @@ import { Score } from '../quiz';
 const Profile = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState<User | null>(null);
-  const localUser = JSON.parse(localStorage.getItem('user') || '{}');
+  const userString = localStorage.getItem('user');
+  const localUser = userString ? JSON.parse(userString) : null;
+  const userId = localUser?.id || localUser?._id;
   const [history, setHistory] = useState<Score[]>([]);
 
+  
 useEffect(() => {
     if (localUser) {
-        fetch(`${API_BASE_URL}/api/scores/users/${localUser.id}`)
+        fetch(`${API_BASE_URL}/api/scores/user/${localUser.id}`)
             .then(res => res.json())
             .then(data => setHistory(data));
     }
