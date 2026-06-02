@@ -23,10 +23,10 @@ useEffect(() => {
 }, []);
   
   const getPlayerRankInfo = (points: number) => {
-  if (points >= 50000) return { title: "Grandmaster", color: "text-neon-yellow", icon: "military_tech" };
-  if (points >= 25000) return { title: "Elite Scholar", color: "text-electric-violet", icon: "workspace_premium" };
-  if (points >= 10000) return { title: "Brainiac", color: "text-lavender-light", icon: "psychology" };
-  if (points >= 5000) return { title: "Knowledge Seeker", color: "text-blue-400", icon: "auto_stories" };
+  if (points >= 1000) return { title: "Grandmaster", color: "text-neon-yellow", icon: "military_tech" };
+  if (points >= 500) return { title: "Elite Scholar", color: "text-electric-violet", icon: "workspace_premium" };
+  if (points >= 200) return { title: "Brainiac", color: "text-lavender-light", icon: "psychology" };
+  if (points >= 50) return { title: "Knowledge Seeker", color: "text-blue-400", icon: "auto_stories" };
   return { title: "Novice", color: "text-lavender-light/40", icon: "school" };
 };
 const rank = getPlayerRankInfo(userData?.totalPoints || 0);
@@ -103,7 +103,7 @@ if (!localUser) {
             <span className="text-[10px] uppercase font-bold tracking-widest opacity-50">Total Points</span>
           </div>
           <div className="glass-card p-6 rounded-3xl text-center border border-white/5">
-            <span className="text-electric-violet text-3xl font-black block">#{userData.rank || '??'}</span>
+            <span className="text-electric-violet text-3xl font-black block">{userData.rank}</span>
             <span className="text-[10px] uppercase font-bold tracking-widest opacity-50"> Rank</span>
           </div>
         </div>

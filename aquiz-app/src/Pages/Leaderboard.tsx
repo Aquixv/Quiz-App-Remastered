@@ -10,6 +10,7 @@ const location = useLocation();
 const [currentCategory, setCurrentCategory] = useState(location.state?.initialCategory || '9');
 const [scores, setScores] = useState<User[]>([]);
  const [apiCategories, setApiCategories] = useState<Quiz[]>([]);
+ const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || '{}')?.username || null);
   
 
 useEffect(() => {
@@ -56,10 +57,10 @@ useEffect(() => {
               #{i + 1}
             </div>
             <div className="size-12 rounded-full overflow-hidden bg-electric-violet/20">
-              <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${s.username}`} alt="avatar" />
+              <img alt={s.username} src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${s.username}`} />
             </div>
             <div className="flex-1">
-              <p className="font-bold text-white text-lg">{s.username}</p>
+              <p className="text-lg font-bold text-white">@{user.username || "Anonymous Player"}</p>
               <p className="text-xs text-lavender-light/40">Attempted {s.totalQuestions} questions</p>
             </div>
             <div className="text-right">
