@@ -10,7 +10,7 @@ const location = useLocation();
 const [currentCategory, setCurrentCategory] = useState(location.state?.initialCategory || '9');
 const [scores, setScores] = useState<User[]>([]);
  const [apiCategories, setApiCategories] = useState<Quiz[]>([]);
- const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || '{}')?.username || null);
+ const [topUsers, setTopUsers] = useState<User[]>([]);
   
 
 useEffect(() => {
@@ -34,7 +34,18 @@ useEffect(() => {
   };
   fetchScores();
 }, [currentCategory]);
-
+useEffect(() => {
+  const fetchTopScorers = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/users/leaderboard`);
+      const data = await response.json();
+      setTopUsers(data); 
+    } catch (err) {
+      console.error("Couldn't fetch leaderboard");
+    }
+  };
+  fetchTopScorers();
+}, []);
  return (
   <div className="bg-deep-purple min-h-screen p-6 text-lavender-light">
     <h1 className="text-3xl font-bold text-white mb-6">Hall of Fame</h1>
@@ -51,24 +62,32 @@ useEffect(() => {
 
     <div className="space-y-4">
       {scores.length > 0 ? (
-        scores.map((s, i) => (
-          <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-glass-border shadow-lg">
-            <div className={`text-2xl font-black ${i === 0 ? 'text-neon-yellow' : 'text-electric-violet/50'}`}>
-              #{i + 1}
+        scores.map((s, i) => {
+          const matchedUser = topUsers.find((u) => u.id === s.id); 
+          const displayUsername = matchedUser?.username || "Anonymous Player";
+
+          return (
+            <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-glass-border shadow-lg">
+              <div className={`text-2xl font-black ${i === 0 ? 'text-neon-yellow' : 'text-electric-violet/50'}`}>
+                #{i + 1}
+              </div>
+              
+              <div className="size-12 rounded-full overflow-hidden bg-electric-violet/20">
+                <img alt={displayUsername} src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${displayUsername}`} />
+              </div>
+              
+              <div className="flex-1">
+                <p className="text-lg font-bold text-white">@{displayUsername}</p>
+                <p className="text-xs text-lavender-light/40">Attempted {s.totalQuestions} questions</p>
+              </div>
+              
+              <div className="text-right">
+                <p className="text-xl font-black text-neon-yellow">{s.score}</p>
+                <p className="text-[10px] uppercase font-bold tracking-tighter">Points</p>
+              </div>
             </div>
-            <div className="size-12 rounded-full overflow-hidden bg-electric-violet/20">
-              <img alt={s.username} src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${s.username}`} />
-            </div>
-            <div className="flex-1">
-              <p className="text-lg font-bold text-white">@{user.username || "Anonymous Player"}</p>
-              <p className="text-xs text-lavender-light/40">Attempted {s.totalQuestions} questions</p>
-            </div>
-            <div className="text-right">
-              <p className="text-xl font-black text-neon-yellow">{s.score}</p>
-              <p className="text-[10px] uppercase font-bold tracking-tighter">Points</p>
-            </div>
-          </div>
-        ))
+          );
+        })
       ) : (
         <div className="text-center py-20 opacity-30">
           <span className="material-symbols-outlined text-6xl mb-2">sentiment_dissatisfied</span>
