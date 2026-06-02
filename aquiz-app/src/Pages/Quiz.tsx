@@ -8,30 +8,51 @@ import Hesnotreading from '../assets/Not-reading.png';
 import Regret from '../assets/Regret.png';
 import doesheknow from '../assets/doesheknow.png';
 import speed from '../assets/speed.jpg';
-interface QuizProps{
-category: string;
-amount: number;
-difficulty: string;
+
+// 1. Define exactly what our Question objects look like
+interface QuestionData {
+    question: string;
+    correct_answer: string;
+    incorrect_answers?: string[];
+    answers: string[];
+    // Optional properties for your internal custom quizzes
+    questionText?: string;
+    correctAnswer?: string;
+    incorrectAnswers?: string[];
+}
+
+// 2. Define what we expect from the Router's state
+interface QuizLocationState {
+    customQuiz?: QuestionData[];
+    quizId?: string;
+}
+
+interface QuizProps {
+    category: string;
+    amount: number;
+    difficulty: string;
 }
 
 const Quiz = ({ category, amount, difficulty }: QuizProps) => {
     const location = useLocation();
     const navigate = useNavigate();
+    
+    // Tell TS what the router state looks like
+    const locationState = location.state as QuizLocationState | null;
 
-
-    const [index, setIndex] = useState(() => {
+    const [index, setIndex] = useState<number>(() => {
         const saved = localStorage.getItem('active_quiz');
         return saved ? JSON.parse(saved).index : 0;
     });
 
-    const [data, setData] = useState(() => {
-        if (location.state?.customQuiz) {
+    const [data, setData] = useState<QuestionData[]>(() => {
+        if (locationState?.customQuiz) {
             localStorage.removeItem('active_quiz');
-            return location.state.customQuiz.map(q => ({
+            return locationState.customQuiz.map((q: any) => ({
                 ...q,
                 question: q.questionText || q.question,
                 correct_answer: q.correctAnswer || q.correct_answer,
-                answers: q.answers ? q.answers : [...q.incorrectAnswers, q.correctAnswer].sort(() => Math.random() - 0.5)
+                answers: q.answers ? q.answers : [...(q.incorrectAnswers || []), q.correctAnswer || q.correct_answer].sort(() => Math.random() - 0.5)
             }));
         }
         const saved = localStorage.getItem('active_quiz');
@@ -39,28 +60,29 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
         return [];
     });
 
-    const [lock, setLock] = useState(false);
-    const [score, setScore] = useState(0);
-    const [result, setResult] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [lock, setLock] = useState<boolean>(false);
+    const [score, setScore] = useState<number>(0);
+    const [result, setResult] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
 
-    const Option1 = useRef(null);
-    const Option2 = useRef(null);
-    const Option3 = useRef(null);
-    const Option4 = useRef(null);
+    // 3. Strictly type the Refs to List Items
+    const Option1 = useRef<HTMLLIElement>(null);
+    const Option2 = useRef<HTMLLIElement>(null);
+    const Option3 = useRef<HTMLLIElement>(null);
+    const Option4 = useRef<HTMLLIElement>(null);
     const option_array = [Option1, Option2, Option3, Option4];
 
     const submitFinalScore = async () => {
         const user = JSON.parse(localStorage.getItem('user') || '{}');
     
-    const payload = {
-        userId: user?.id || user?._id || null, 
-        username: user?.username || "Guest", 
-        score: score * 10, 
-        quizId: location.state?.quizId || null,
-        categoryId: category || '9',
-        totalQuestions: data.length
-    };
+        const payload = {
+            userId: user?.id || user?._id || null, 
+            username: user?.username || "Guest", 
+            score: score * 10, 
+            quizId: locationState?.quizId || null,
+            categoryId: category || '9',
+            totalQuestions: data.length
+        };
 
         try {
             await fetch(`${API_BASE_URL}/api/scores`, {
@@ -88,7 +110,7 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
                 .then(res => res.json())
                 .then(resData => {
                     if (isMounted && resData?.results) {
-                        const formatted = resData.results.map(q => ({
+                        const formatted = resData.results.map((q: any) => ({
                             ...q,
                             answers: [...q.incorrect_answers, q.correct_answer].sort(() => Math.random() - 0.5)
                         }));
@@ -116,20 +138,26 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
         if (result) localStorage.removeItem('active_quiz');
     }, [result]);
 
-    const decodeHTML = (html) => {
+    // Added the 'string' type requirement here
+    const decodeHTML = (html: string) => {
         const txt = document.createElement("textarea");
         txt.innerHTML = html;
         return txt.value;
     };
 
-    const checkAnswer = (e, ans) => {
+    // 4. Type the Event and use 'currentTarget'
+    const checkAnswer = (e: React.MouseEvent<HTMLLIElement>, ans: string) => {
         if (!lock) {
             const correct = decodeHTML(data[index].correct_answer);
+            
+            // e.currentTarget guarantees TS knows this is the actual <li> tag you clicked
+            const target = e.currentTarget; 
+
             if (correct === ans) {
-                e.target.classList.add("correct");
+                target.classList.add("correct");
                 setScore(prev => prev + 1);
             } else {
-                e.target.classList.add("incorrect");
+                target.classList.add("incorrect");
                 option_array.forEach(opt => {
                     if (opt.current && decodeHTML(opt.current.innerText) === correct) {
                         opt.current.classList.add("correct");
@@ -156,13 +184,14 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
     const getFeedback = () => {
         const percentage = (score / data.length) * 100;
         if (percentage === 100) {
-    confetti({
-        particleCount: 150,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#00d397', '#ffffff', '#553f9a']
-    });
-return { msg: "Ts won't take you to heaven btw", color: "#00d397", gif: doesheknow }};
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#00d397', '#ffffff', '#553f9a']
+            });
+            return { msg: "Ts won't take you to heaven btw", color: "#00d397", gif: doesheknow };
+        }
         if (percentage >= 80) return { msg: "You're not him", color: "#ff4a4a", gif: Regret };
         if (percentage >= 50) return { msg: "", color: "#553f9a", gif: Higuruma };
         if (percentage === 0) return { msg: "Did you even read?", color: "#ff4a4a", gif: Hesnotreading };

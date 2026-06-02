@@ -3,6 +3,7 @@ import './Setup.css';
 import { useNavigate } from 'react-router-dom';
 import API_BASE_URL from './config';
 import { Question } from '../quiz';
+import { QuizSettingsState } from '../App';
 export interface QuizSettings {
   amount: number;
   category: number | string;
@@ -13,9 +14,10 @@ interface Category {
   name: string;
 }
 
-interface SetupProps {
-  setQuizSettings: (settings: QuizSettings) => void;
-}
+interface SetupProps
+ { setQuizSettings: React.Dispatch<React.SetStateAction<QuizSettingsState>>;
+  
+  }
 
 const Setup = ({ setQuizSettings }: SetupProps) => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -23,9 +25,9 @@ const Setup = ({ setQuizSettings }: SetupProps) => {
   const [joinCode, setJoinCode] = useState<string>('');
   const [isJoinVisible, setIsJoinVisible] = useState<boolean>(false);
 
-  const [formData, setFormData] = useState<QuizSettings>({
+  const [formData, setFormData] = useState<QuizSettingsState>({
     amount: 10,
-    category: 9,
+    category: '9',
     difficulty: 'easy'
   });
 
