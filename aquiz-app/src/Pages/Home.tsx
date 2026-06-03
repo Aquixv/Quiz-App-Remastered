@@ -34,13 +34,13 @@ useEffect(() => {
   fetchTopScorers();
 }, []);
 
-  const categories = [
-    { icon: 'science', label: 'Science' },
-    { icon: 'history_edu', label: 'History' },
-    { icon: 'movie_filter', label: 'Pop Culture' },
-    { icon: 'computer', label: 'Tech' },
-    { icon: 'sports_basketball', label: 'Sports' },
-    { icon: 'palette', label: 'Art' }
+ const categories = [
+    { id: '17', icon: 'science', label: 'Science & Nature' },
+    { id: '23', icon: 'history_edu', label: 'History' },
+    { id: '11', icon: 'movie_filter', label: 'Film & Media' },
+    { id: '18', icon: 'computer', label: 'Tech & Code' },
+    { id: '21', icon: 'sports_basketball', label: 'Sports' },
+    { id: '25', icon: 'palette', label: 'Art' }
   ];
 const handleQuickStart = (categoryId: string) => {
         setQuizSettings({
@@ -104,7 +104,7 @@ const handleQuickStart = (categoryId: string) => {
                 onClick={() => navigate('/setup')}
                 className="flex w-full max-w-[360px] cursor-pointer items-center justify-center rounded-xl h-14 md:h-20 bg-neon-yellow text-deep-purple text-lg md:text-2xl font-bold shadow-lg shadow-neon-yellow/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
               >
-                Start Quiz
+                Start a Quiz
               </button>
             </div>
           </section>
@@ -127,7 +127,7 @@ const handleQuickStart = (categoryId: string) => {
   <div 
     key={i} 
     className="flex flex-col items-center gap-3 mb-6 group cursor-pointer"
-    onClick={() => navigate('/leaderboard', { state: { initialCategory: cat.label} })} 
+    onClick={() => handleQuickStart(cat.id)} 
   >
     <div className="w-20 h-20 rounded-3xl bg-white/5 backdrop-blur-xl flex items-center justify-center text-electric-violet group-hover:bg-electric-violet/20 transition-all">
       <span className="material-symbols-outlined !text-[40px]">{cat.icon}</span>
@@ -141,7 +141,7 @@ const handleQuickStart = (categoryId: string) => {
           <section className="px-6 py-6">
             <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-5 shadow-xl">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-white">Top Scorers</h3>
+                <h3 className="text-lg font-bold text-white">Top Total Scorers</h3>
                 <span className="material-symbols-outlined text-neon-yellow">emoji_events</span>
               </div>
             <div className="space-y-4">
