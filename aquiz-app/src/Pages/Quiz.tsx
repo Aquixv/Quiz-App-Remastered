@@ -190,12 +190,12 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
                 origin: { y: 0.6 },
                 colors: ['#00d397', '#ffffff', '#553f9a']
             });
-            return { msg: "Ts won't take you to heaven btw", color: "#00d397", gif: doesheknow };
+            return { msg: "You're not him", color: "#00d397", gif: doesheknow };
         }
-        if (percentage >= 80) return { msg: "You're not him", color: "#ff4a4a", gif: Regret };
+        if (percentage >= 80) return { msg: "", color: "#ff4a4a", gif: Regret };
         if (percentage >= 50) return { msg: "", color: "#553f9a", gif: Higuruma };
-        if (percentage === 0) return { msg: "Did you even read?", color: "#ff4a4a", gif: Hesnotreading };
-        return { msg: "Time to Hit the Books... 📚", color: "#ff4a4a", gif: speed };
+        if (percentage === 0) return { msg: "", color: "#ff4a4a", gif: Hesnotreading };
+        return { msg: "", color: "#ff4a4a", gif: speed };
     };
 
     if (loading) return <div className='container'><h2>Loading Questions...</h2></div>;
@@ -208,7 +208,7 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
                 <div className="result-container">
                     <img src={feedback.gif} alt="Reaction" className="result-gif" />
                     <h2 style={{ color: feedback.color }}>{feedback.msg}</h2>
-                    <h3>You scored {score} out of {data.length}</h3>
+                    <h3>{score}/{data.length}</h3>
                     <div className='result-buttons'>
                         <button onClick={() => navigate('/setup')}>New Quiz?</button>
                         <button onClick={() => navigate('/')}>Home</button>

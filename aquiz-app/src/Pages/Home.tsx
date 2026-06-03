@@ -34,13 +34,14 @@ useEffect(() => {
   fetchTopScorers();
 }, []);
 
- const categories = [
+const categories = [
     { id: '17', icon: 'science', label: 'Science & Nature' },
     { id: '23', icon: 'history_edu', label: 'History' },
     { id: '11', icon: 'movie_filter', label: 'Film & Media' },
     { id: '18', icon: 'computer', label: 'Tech & Code' },
     { id: '21', icon: 'sports_basketball', label: 'Sports' },
-    { id: '25', icon: 'palette', label: 'Art' }
+    { id: '25', icon: 'palette', label: 'Art' },
+    { id: '31', icon: 'auto_awesome', label: 'Anime & Manga' } 
   ];
 const handleQuickStart = (categoryId: string) => {
         setQuizSettings({
