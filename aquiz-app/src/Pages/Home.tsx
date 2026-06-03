@@ -2,8 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Home.css';
 import { User } from '../quiz';
+import { QuizSettingsState } from '../App';
 import AuthModal from './AuthModal';
 import API_BASE_URL from './config';
+interface HomeProps {
+    setQuizSettings: React.Dispatch<React.SetStateAction<QuizSettingsState>>;
+}
 
 const Home = () => {
   const navigate = useNavigate();
@@ -11,7 +15,12 @@ const Home = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
 const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || '{}')?.username || null);
 const [topUsers, setTopUsers] = useState<User[]>([]);
-
+  const [quizSettings, setQuizSettings] = useState<QuizSettingsState>({
+    amount: 10,
+    category: '9', 
+    difficulty: 'easy'
+  });
+  
 useEffect(() => {
   const fetchTopScorers = async () => {
     try {
@@ -33,7 +42,14 @@ useEffect(() => {
     { icon: 'sports_basketball', label: 'Sports' },
     { icon: 'palette', label: 'Art' }
   ];
-
+const handleQuickStart = (categoryId: string) => {
+        setQuizSettings({
+            amount: 10,
+            category: categoryId,
+            difficulty: 'medium' 
+        });
+        navigate('/quiz');
+    };
   return (
     <div className="bg-deep-purple text-lavender-light min-h-screen flex flex-col font-display">
       <div className="relative flex h-full w-full flex-col overflow-x-hidden">
@@ -83,10 +99,10 @@ useEffect(() => {
               </div>
             </div>
 
-            <div className="flex px-4">
+            <div className="flex px-4 justify-center">
               <button 
                 onClick={() => navigate('/setup')}
-                className="flex w-full cursor-pointer items-center justify-center rounded-xl h-14 md:h-20 bg-neon-yellow text-deep-purple text-lg md:text-2xl font-bold shadow-lg shadow-neon-yellow/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                className="flex w-full max-w-[360px] cursor-pointer items-center justify-center rounded-xl h-14 md:h-20 bg-neon-yellow text-deep-purple text-lg md:text-2xl font-bold shadow-lg shadow-neon-yellow/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
               >
                 Start Quiz
               </button>
