@@ -9,19 +9,15 @@ import Regret from '../assets/Regret.png';
 import doesheknow from '../assets/doesheknow.png';
 import speed from '../assets/speed.jpg';
 
-// 1. Define exactly what our Question objects look like
 interface QuestionData {
     question: string;
     correct_answer: string;
     incorrect_answers?: string[];
     answers: string[];
-    // Optional properties for your internal custom quizzes
     questionText?: string;
     correctAnswer?: string;
     incorrectAnswers?: string[];
 }
-
-// 2. Define what we expect from the Router's state
 interface QuizLocationState {
     customQuiz?: QuestionData[];
     quizId?: string;
@@ -36,8 +32,6 @@ interface QuizProps {
 const Quiz = ({ category, amount, difficulty }: QuizProps) => {
     const location = useLocation();
     const navigate = useNavigate();
-    
-    // Tell TS what the router state looks like
     const locationState = location.state as QuizLocationState | null;
 
     const [index, setIndex] = useState<number>(() => {
@@ -64,8 +58,10 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
     const [score, setScore] = useState<number>(0);
     const [result, setResult] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
+    const [guestName, setGuestName] = useState('');
+    const [needsNamePrompt, setNeedsNamePrompt] = useState(false);
+    const [scoreSaved, setScoreSaved] = useState(false);
 
-    // 3. Strictly type the Refs to List Items
     const Option1 = useRef<HTMLLIElement>(null);
     const Option2 = useRef<HTMLLIElement>(null);
     const Option3 = useRef<HTMLLIElement>(null);
@@ -162,7 +158,7 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
         }
     };
 
-    const next = () => {
+    const next1 = () => {
         if (lock) {
             if (index === data.length - 1) {
                 setResult(true);
@@ -186,25 +182,8 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
             });
             return { msg: "You're not him", color: "#00d397", gif: doesheknow };
         }
-        if (percentage >= 60) {
-            confetti({
-                particleCount: 150,
-                spread: 70,
-                origin: { y: 0.6 },
-                colors: ['#00d397', '#ffffff', '#553f9a']
-            });
-            return { msg: "", color: "#ff4a4a", gif: Regret };
-        }
-        if (percentage >= 50) 
-            {
-            confetti({
-                particleCount: 150,
-                spread: 70,
-                origin: { y: 0.6 },
-                colors: ['#00d397', '#ffffff', '#553f9a']
-            });
-            return { msg: "", color: "#553f9a", gif: Higuruma };
-        }
+        if (percentage >= 60) return { msg: "", color: "#ff4a4a", gif: Regret };
+        if (percentage >= 50) return { msg: "", color: "#553f9a", gif: Higuruma };
         if (percentage === 0) return { msg: "", color: "#ff4a4a", gif: Hesnotreading };
         return { msg: "", color: "#ff4a4a", gif: speed };
     };
@@ -212,6 +191,31 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
     if (loading) return <div className='container'><h2>Loading Questions...</h2></div>;
 
     const feedback = getFeedback();
+
+    const handleScoreSubmission = async (playerName: string, playerId: string | null = null) => {
+    const payload = {
+        userId: playerId, 
+        username: playerName, 
+        score: score * 10, 
+        quizId: locationState?.quizId || null,
+        categoryId: category || '9',
+        totalQuestions: data.length
+    };try {
+        await fetch(`${API_BASE_URL}/api/scores`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        console.log("🏆 Score logged successfully!");
+        setScoreSaved(true);
+        setNeedsNamePrompt(false);
+        if (!playerId) {
+            localStorage.setItem('user', JSON.stringify({ username: playerName }));
+        }
+    } catch (err) {
+        console.error("❌ Network error saving score:", err);
+    }
+};
 
     return (
         <div className='container'>
@@ -235,7 +239,7 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
                             </li>
                         ))}
                     </ul>
-                    <button onClick={next}>Next</button>
+                    <button onClick={next1}>Next</button>
                     <div className="index">{index + 1} of {data.length} questions</div>
                 </>
             )}
