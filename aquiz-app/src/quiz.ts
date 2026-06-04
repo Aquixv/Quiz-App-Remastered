@@ -30,4 +30,5 @@ export interface Score {
     quizTitle: string;
   }
   username:string;
+  categoryId:string;
 }

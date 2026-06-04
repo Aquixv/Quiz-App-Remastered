@@ -5,6 +5,33 @@ import './Profile.css'
 import { User } from '../quiz';
 import { Score } from '../quiz';
 
+const categoryMap: Record<string, string> = {
+'9': 'General Knowledge',
+'10': 'Entertainment: Books',
+'11': 'Entertainment: Film',
+'12': 'Entertainment: Music',
+'13': 'Entertainment: Musicals & Theatres',
+'14': 'Entertainment: Television',
+'15': 'Entertainment: Video Games',
+'16': 'Entertainment: Board Games',
+'17': 'Science & Nature',
+'18': 'Science: Computers',
+'19': 'Science: Mathematics',
+'20': 'Mythology',
+'21': 'Sports',
+'22': 'Geography',
+'23': 'History',
+'24': 'Politics',
+'25': 'Art',
+'26': 'Celebrities',
+'27': 'Animals',
+'28': 'Vehicles',
+'29': 'Entertainment: Comics',
+'30': 'Science: Gadgets',
+'31': 'Entertainment: Japanese Anime & Manga',
+'32': 'Entertainment: Cartoon & Animations'
+};
+
 const Profile = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState<User | null>(null);
@@ -113,21 +140,29 @@ if (!localUser) {
   <h3 className="text-sm font-bold uppercase tracking-widest text-lavender-light/40 mb-4 ml-1">Recent Activity</h3>
   <div className="space-y-3">
     {history.length > 0 ? (
-  history.slice(0,5).map((item, i) => (
+  history.slice(0,3).map((item, i) => (
     <div key={i} className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
       <div className="flex items-center gap-3">
         <div className="size-8 rounded-full bg-electric-violet/20 flex items-center justify-center">
           <span className="material-symbols-outlined text-[16px] text-electric-violet">quiz</span>
         </div>
         <p className="font-bold text-white text-sm">
-          {item.quizId?.quizTitle || "External Quiz"}
-        </p>
+  {item.quizId?.quizTitle || `${categoryMap[item.categoryId || '9']}`}
+</p>
       </div>
       <span className="text-neon-yellow font-black text-sm">+{item.score} pts</span>
     </div>
   ))
 ) : (
   <p className="text-center py-6 text-sm text-lavender-light/20 italic">No games played yet. Go test yourself!</p>
+)}
+{history.length > 3 && (
+  <button 
+    onClick={() => navigate('/history')}
+    className="w-full mt-2 py-3 rounded-xl font-bold text-sm text-electric-violet bg-electric-violet/10 hover:bg-electric-violet/20 transition-all"
+  >
+    See Full History
+  </button>
 )}
 </div>
 </div>
