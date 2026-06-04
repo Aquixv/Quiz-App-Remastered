@@ -31,4 +31,5 @@ export interface Score {
   }
   username:string;
   categoryId:string;
+  createdAt:string;
 }
