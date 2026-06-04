@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import './Leaderboard.css'
 import API_BASE_URL from './config';
-import { Question, Quiz, User } from '../quiz';
+import { Question, Quiz, User, Score } from '../quiz';
 const Leaderboard = () => {
 
 const location = useLocation();
@@ -46,6 +46,21 @@ useEffect(() => {
   };
   fetchTopScorers();
 }, []);
+const getUniqueTopScores = (allScores: User[]) => {
+    const userMap = new Map<string, User>();
+
+    allScores.forEach(scoreItem => {
+        const name = scoreItem.username || "Anonymous Player";
+        const existingScore = userMap.get(name);
+        if (!existingScore || scoreItem.score > existingScore.score) {
+            userMap.set(name, scoreItem);
+        }
+    });
+    
+    return Array.from(userMap.values()).sort((a, b) => b.score - a.score);
+};
+
+const displayScores = getUniqueTopScores(scores);
  return (
   <div className="bg-deep-purple min-h-screen p-6 text-lavender-light">
     <h1 className="text-3xl font-bold text-white mb-6">Hall of Fame</h1>
@@ -62,7 +77,7 @@ useEffect(() => {
 
     <div className="space-y-4">
       {scores.length > 0 ? (
-        scores.map((s, i) => {
+        displayScores.map((s, i) => {
           const matchedUser = topUsers.find((u) => u.id === s.id); 
           const displayUsername = matchedUser?.username || "Anonymous Player";
 

@@ -29,4 +29,5 @@ export interface Score {
     _id: string;
     quizTitle: string;
   }
+  username:string;
 }

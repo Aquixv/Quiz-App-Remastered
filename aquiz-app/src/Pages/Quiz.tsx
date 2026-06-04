@@ -186,8 +186,25 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
             });
             return { msg: "You're not him", color: "#00d397", gif: doesheknow };
         }
-        if (percentage >= 60) return { msg: "", color: "#ff4a4a", gif: Regret };
-        if (percentage >= 50) return { msg: "", color: "#553f9a", gif: Higuruma };
+        if (percentage >= 60) {
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#00d397', '#ffffff', '#553f9a']
+            });
+            return { msg: "", color: "#ff4a4a", gif: Regret };
+        }
+        if (percentage >= 50) 
+            {
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#00d397', '#ffffff', '#553f9a']
+            });
+            return { msg: "", color: "#553f9a", gif: Higuruma };
+        }
         if (percentage === 0) return { msg: "", color: "#ff4a4a", gif: Hesnotreading };
         return { msg: "", color: "#ff4a4a", gif: speed };
     };

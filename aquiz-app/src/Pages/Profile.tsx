@@ -25,7 +25,7 @@ useEffect(() => {
   const getPlayerRankInfo = (points: number) => {
   if (points >= 1000) return { title: "First Class!", color: "text-neon-yellow", icon: "military_tech" };
   if (points >= 500) return { title: "Scholar!!", color: "text-electric-violet", icon: "workspace_premium" };
-  if (points >= 200) return { title: "I dey learn work", color: "text-lavender-light", icon: "psychology" };
+  if (points >= 200) return { title: "Apprentice!", color: "text-lavender-light", icon: "school" };
   if (points >= 50) return { title: "Houseboy", color: "text-blue-400", icon: "auto_stories" };
   return { title: "Novice", color: "text-lavender-light/40", icon: "school" };
 };
