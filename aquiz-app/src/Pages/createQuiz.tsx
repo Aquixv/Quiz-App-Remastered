@@ -91,6 +91,12 @@ const copyToClipboard = () => {
 
   return (
     <div className="bg-deep-purple min-h-screen p-6 text-lavender-light font-display pb-32">
+      <button 
+                    onClick={() => navigate('/myquizzes')} 
+                    className="material-symbols-outlined mr-4 hover:text-white transition-colors"
+                >
+                    arrow_back
+                </button>
       <h1 className="text-3xl font-bold mb-6 text-white text-center">Create Custom Quiz</h1>
       <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
         <input 

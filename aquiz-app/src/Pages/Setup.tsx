@@ -68,12 +68,13 @@ const Setup = ({ setQuizSettings }: SetupProps) => {
   };
 
   return (
-    <div className='container setup-card'>
+    <div className="min-h-screen bg-deep-purple text-lavender-light flex items-center justify-center p-6">
+  <div className="w-full max-w-md bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8">
       <h2>Customize Your Challenge</h2>
       <hr />
       
       <div className='settings-group'>
-        <p>Select Difficulty</p>
+        <p style={{marginTop:'12px'}}>Select Difficulty</p>
         <select name="difficulty" value={formData.difficulty} onChange={handleChange}>
             <option value="easy">Easy</option>
             <option value="medium">Medium</option>
@@ -82,7 +83,7 @@ const Setup = ({ setQuizSettings }: SetupProps) => {
         </select>
       </div>
 
-      <div className='settings-group'>
+      <div className='settings-group' style={{paddingTop:'10px'}}>
         <p>Number of Questions</p>
         <input 
           type="number" name="amount" min="1" max="20" 
@@ -100,18 +101,20 @@ const Setup = ({ setQuizSettings }: SetupProps) => {
       </div>
 
       <div className='buttons'>
-        <button className='start-btn' onClick={handleStart}>Start Quiz</button>
-        <div className="join-container" style={{ width: '250px', marginTop: '10px' }}>
+        <button className="w-full max-w-[250px] py-4 mt-4 rounded-xl font-bold transition-all duration-300 backdrop-blur-md bg-electric-violet/20 border border-electric-violet/50 text-white hover:bg-electric-violet/40 hover:shadow-[0_0_15px_rgba(139,92,246,0.3)]"  onClick={handleStart}>
+  Start Quiz
+</button>
+        <div className="join-container" style={{ width: '250px', marginTop: '8px' }}>
           <button 
-              className='start-btn' 
+             className="w-full py-4 rounded-xl font-bold transition-all duration-300 backdrop-blur-md bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20"
               onClick={() => setIsJoinVisible(!isJoinVisible)}
-              style={{ marginBottom: isJoinVisible ? '10px' : '0' }}
+             
           >
               {isJoinVisible ? 'Cancel' : 'Join Custom Quiz'}
           </button>
 
           {isJoinVisible && (
-              <div className="join-dropdown" style={{ display: 'flex', gap: '10px', animation: 'fadeIn 0.3s' }}>
+              <div className="join-dropdown" style={{ display: 'flex',marginTop:'4px', gap: '10px', animation: 'fadeIn 0.3s' }}>
                   <input 
                       type="text" 
                       placeholder="Enter 6-digit code..." 
@@ -143,8 +146,9 @@ const Setup = ({ setQuizSettings }: SetupProps) => {
               </div>
           )}
         </div>
-        <button className='start-btn' onClick={() => navigate('/')}>Home</button>
+        <button className="w-full max-w-[250px] py-4 mt-2 rounded-xl font-bold transition-all duration-300 backdrop-blur-md bg-electric-violet/20 border border-electric-violet/50 text-white hover:bg-electric-violet/40 hover:shadow-[0_0_15px_rgba(139,92,246,0.3)]" onClick={() => navigate('/')}>Home</button>
       </div>
+    </div>
     </div>
   );
 };

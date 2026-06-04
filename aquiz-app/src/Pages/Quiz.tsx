@@ -137,20 +137,14 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
     useEffect(() => {
         if (result) localStorage.removeItem('active_quiz');
     }, [result]);
-
-    // Added the 'string' type requirement here
     const decodeHTML = (html: string) => {
         const txt = document.createElement("textarea");
         txt.innerHTML = html;
         return txt.value;
     };
-
-    // 4. Type the Event and use 'currentTarget'
     const checkAnswer = (e: React.MouseEvent<HTMLLIElement>, ans: string) => {
         if (!lock) {
             const correct = decodeHTML(data[index].correct_answer);
-            
-            // e.currentTarget guarantees TS knows this is the actual <li> tag you clicked
             const target = e.currentTarget; 
 
             if (correct === ans) {
@@ -192,7 +186,7 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
             });
             return { msg: "You're not him", color: "#00d397", gif: doesheknow };
         }
-        if (percentage >= 80) return { msg: "", color: "#ff4a4a", gif: Regret };
+        if (percentage >= 60) return { msg: "", color: "#ff4a4a", gif: Regret };
         if (percentage >= 50) return { msg: "", color: "#553f9a", gif: Higuruma };
         if (percentage === 0) return { msg: "", color: "#ff4a4a", gif: Hesnotreading };
         return { msg: "", color: "#ff4a4a", gif: speed };
@@ -208,10 +202,10 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
                 <div className="result-container">
                     <img src={feedback.gif} alt="Reaction" className="result-gif" />
                     <h2 style={{ color: feedback.color }}>{feedback.msg}</h2>
-                    <h3>{score}/{data.length}</h3>
+                    <h3 style={{display:'flex', alignItems:'center', gap:'10px'}}>{score*10} Points! <img style={{width:'5vw', height:'10vh'}} src="https://www.svgrepo.com/show/513363/trophy.svg" alt="" /></h3>
                     <div className='result-buttons'>
-                        <button onClick={() => navigate('/setup')}>New Quiz?</button>
-                        <button onClick={() => navigate('/')}>Home</button>
+                        <button className="w-full max-w-[250px] py-4 mt-2 rounded-xl font-bold transition-all duration-300 backdrop-blur-md bg-electric-violet/20 border border-electric-violet/50 text-white hover:bg-electric-violet/40 hover:shadow-[0_0_15px_rgba(139,92,246,0.3)]" onClick={() => navigate('/setup')}>New Quiz?</button>
+                        <button className="w-full max-w-[250px] py-4 mt-2 rounded-xl font-bold transition-all duration-300 backdrop-blur-md bg-electric-violet/20 border border-electric-violet/50 text-white hover:bg-electric-violet/40 hover:shadow-[0_0_15px_rgba(139,92,246,0.3)]" onClick={() => navigate('/')}>Home</button>
                     </div>
                 </div>
             ) : (

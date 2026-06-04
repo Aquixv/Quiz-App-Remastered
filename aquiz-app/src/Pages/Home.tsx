@@ -69,14 +69,12 @@ const handleQuickStart = (categoryId: string) => {
     ) : (
       <button 
         onClick={() => setIsAuthOpen(true)}
-        className="text-xs font-bold uppercase text-neon-yellow border border-neon-yellow/30 px-3 py-2 rounded-xl hover:bg-neon-yellow/10 transition-all"
+        className="text-xs font-bold uppercase text-neon-yellow border border-electric-violet/30 px-3 py-2 rounded-xl hover:text-electric-violet bg-electric-violet/10 transition-all"
       >
         Login
       </button>
     )}
-    <div className="size-10 flex items-center justify-center text-electric-violet">
-      <span className="material-symbols-outlined">notifications</span>
-    </div>
+    
   </div>
 </header>
 

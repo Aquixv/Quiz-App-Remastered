@@ -23,10 +23,10 @@ useEffect(() => {
 }, []);
   
   const getPlayerRankInfo = (points: number) => {
-  if (points >= 1000) return { title: "Grandmaster", color: "text-neon-yellow", icon: "military_tech" };
-  if (points >= 500) return { title: "Elite Scholar", color: "text-electric-violet", icon: "workspace_premium" };
-  if (points >= 200) return { title: "Brainiac", color: "text-lavender-light", icon: "psychology" };
-  if (points >= 50) return { title: "Knowledge Seeker", color: "text-blue-400", icon: "auto_stories" };
+  if (points >= 1000) return { title: "First Class!", color: "text-neon-yellow", icon: "military_tech" };
+  if (points >= 500) return { title: "Scholar!!", color: "text-electric-violet", icon: "workspace_premium" };
+  if (points >= 200) return { title: "I dey learn work", color: "text-lavender-light", icon: "psychology" };
+  if (points >= 50) return { title: "Houseboy", color: "text-blue-400", icon: "auto_stories" };
   return { title: "Novice", color: "text-lavender-light/40", icon: "school" };
 };
 const rank = getPlayerRankInfo(userData?.totalPoints || 0);
@@ -92,20 +92,20 @@ if (!localUser) {
           </div>
           <h1 className="text-3xl font-bold text-white">@{userData.username}</h1>
 <div className={`flex items-center gap-2 font-bold ${rank.color}`}>
-  <span className="material-symbols-outlined text-sm">{rank.icon}</span>
-  {rank.title}
+  <span className="pt-4 material-symbols-outlined text-sm">{rank.icon}</span>
+ <span className="pt-4 text-md">{rank.title}</span> 
 </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4 mb-8">
           <div className="glass-card p-6 rounded-3xl text-center border border-white/5">
-            <span className="text-neon-yellow text-3xl font-black block">{userData?.totalPoints?.toLocaleString() || '0'}</span>
+            <span className="text-electric-violet text-3xl font-black block">{userData?.totalPoints?.toLocaleString() || '0'}</span>
             <span className="text-[10px] uppercase font-bold tracking-widest opacity-50">Total Points</span>
           </div>
           <div className="glass-card p-6 rounded-3xl text-center border border-white/5">
-            <span className="text-electric-violet text-3xl font-black block">{userData.rank}</span>
-            <span className="text-[10px] uppercase font-bold tracking-widest opacity-50"> Rank</span>
-          </div>
+  <span className="text-electric-violet text-3xl font-black block">{history.length}</span>
+  <span className="text-[10px] uppercase font-bold tracking-widest opacity-50">Quizzes Played</span>
+</div>
         </div>
 
         <div className="space-y-3">
@@ -113,16 +113,23 @@ if (!localUser) {
   <h3 className="text-sm font-bold uppercase tracking-widest text-lavender-light/40 mb-4 ml-1">Recent Activity</h3>
   <div className="space-y-3">
     {history.length > 0 ? (
-      history.map((item, i) => (
-  <div key={i}>
-    <p>{item.quizId?.quizTitle || "External Quiz"}</p> 
-    <p>{item.score} pts</p>
-  </div>
-))
-    ) : (
-      <p className="text-center py-6 text-sm text-lavender-light/20 italic">No games played yet. Go test yourself!</p>
-    )}
-  </div>
+  history.slice(0,5).map((item, i) => (
+    <div key={i} className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+      <div className="flex items-center gap-3">
+        <div className="size-8 rounded-full bg-electric-violet/20 flex items-center justify-center">
+          <span className="material-symbols-outlined text-[16px] text-electric-violet">quiz</span>
+        </div>
+        <p className="font-bold text-white text-sm">
+          {item.quizId?.quizTitle || "External Quiz"}
+        </p>
+      </div>
+      <span className="text-neon-yellow font-black text-sm">+{item.score} pts</span>
+    </div>
+  ))
+) : (
+  <p className="text-center py-6 text-sm text-lavender-light/20 italic">No games played yet. Go test yourself!</p>
+)}
+</div>
 </div>
           <button 
             onClick={() => navigate('/myquizzes')}
