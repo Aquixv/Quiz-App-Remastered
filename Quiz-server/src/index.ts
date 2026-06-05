@@ -3,15 +3,18 @@ import { startStandaloneServer } from '@apollo/server/standalone';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { typeDefs } from './typeDefs';
-import * as jwt from 'jsonwebtoken'
-import User from '../models/User';
+import * as jwt from 'jsonwebtoken';
 import { resolvers } from './resolvers';
 import dns from "node:dns/promises";
+
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 dotenv.config();
+export interface MyContext {
+  user?: { userId: string; username: string };
+}
 
-const server = new ApolloServer({
+const server = new ApolloServer<MyContext>({
   typeDefs,
   resolvers,
 });
@@ -23,24 +26,32 @@ const startServer = async () => {
 
     const { url } = await startStandaloneServer(server, {
       listen: { port: 4000 },
-      context: async ({ req }) => {
+      
+      context: async ({ req }): Promise<MyContext> => {
         const authHeader = req.headers.authorization || '';
         const token = authHeader.replace('Bearer ', '');
 
-        if (!token) return { user: null };
+        if (!token) return {}; 
 
         try {
           const decoded = jwt.verify(token, process.env.API_SECRET as string) as any;
-          const user = await User.findById(decoded.id).select('-password');
-          return { user }; 
+          
+          return { 
+            user: { 
+              userId: decoded.userId, 
+              username: decoded.username 
+            } 
+          };
         } catch (err) {
-          return { user: null }; 
+          return {}; 
         }
       },
     });
-console.log(`🚀 GraphQL Server ready at: ${url}`);
-} catch (error) {
-console.error('Database connection failed:', error);
-}
+    
+    console.log(`🚀 GraphQL Server ready at: ${url}`);
+  } catch (error) {
+    console.error('Database connection failed:', error);
+  }
 };
+
 startServer();

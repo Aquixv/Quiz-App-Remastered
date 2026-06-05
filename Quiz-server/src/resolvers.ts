@@ -3,6 +3,8 @@ import * as jwt from 'jsonwebtoken'
 import User from "../models/User";
 import Quiz from "../models/Quiz"; 
 import Score from "../models/Score";
+import { GraphQLError } from 'graphql';
+import { MyContext } from './index'; 
 
 interface RegisterArgs {
   username: string;
@@ -60,13 +62,19 @@ export const resolvers = {
         user
       };
     },
-    createQuiz: async (_: unknown, args: CreateQuizArgs) => {
+    createQuiz: async (_: any, args: any, context: MyContext) => {
+      if (!context.user) {
+        throw new GraphQLError('You must be logged in to create a quiz.', {
+          extensions: { code: 'UNAUTHENTICATED' },
+        });
+      }
+
       const generatedCode = Math.random().toString(36).substring(2, 8).toUpperCase();
       
       const newQuiz = new Quiz({
         quizTitle: args.quizTitle,
-        creatorName: args.creatorName || "Anonymous",
-        creatorId: args.creatorId,
+        creatorName: context.user.username,
+        creatorId: context.user.userId,     
         questions: args.questions,
         joinCode: generatedCode
       });
