@@ -32,9 +32,13 @@ type Quiz {
   getUsers: [User]
   getUser(id: ID!): User
   }
-
+type AuthPayload {
+  token: String!
+  user: User!
+}
   type Mutation {
   registerUser(username: String!, password: String!): User
+  loginUser(username: String!, password: String!): AuthPayload
   createQuiz(
     quizTitle: String!
     creatorName: String
