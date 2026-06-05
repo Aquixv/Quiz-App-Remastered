@@ -5,13 +5,41 @@ export const typeDefs = `#graphql
     totalPoints: Int
     createdAt: String
   }
+    input QuestionInput {
+  questionText: String!
+  correctAnswer: String!
+  incorrectAnswers: [String!]!
+}
+  type Question {
+  questionText: String!
+  correctAnswer: String!
+  incorrectAnswers: [String!]!
+}
 
-  type Query {
-    getUsers: [User]
-    getUser(id: ID!): User
+type Quiz {
+  _id: ID!
+  quizTitle: String!
+  joinCode: String!
+  creatorName: String
+  creatorId: ID!
+  questions: [Question!]!
+  createdAt: String
+}
+   type Query {
+  getQuizzes: [Quiz]
+  getQuiz(id: ID!): Quiz
+  getQuizByCode(joinCode: String!): Quiz
+  getUsers: [User]
+  getUser(id: ID!): User
   }
 
   type Mutation {
-    registerUser(username: String!, password: String!): User
-  }
+  registerUser(username: String!, password: String!): User
+  createQuiz(
+    quizTitle: String!
+    creatorName: String
+    creatorId: ID!
+    questions: [QuestionInput!]!
+  ): Quiz
+}
 `;
