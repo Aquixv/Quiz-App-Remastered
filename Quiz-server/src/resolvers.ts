@@ -108,11 +108,11 @@ export const resolvers = {
     },
     submitScore: async (_: any, args: any) => {
       const newScore = new Score({
-        userId: args.userId || null, // Null is perfectly fine for guests
+        userId: args.userId || null,
         username: args.username,
         score: args.score,
         quizId: args.quizId || null,
-        categoryId: args.categoryId || '9', // Default to General Knowledge
+        categoryId: args.categoryId || '9',
         totalQuestions: args.totalQuestions || 10
       });
       return await newScore.save();
