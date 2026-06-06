@@ -11,11 +11,16 @@ interface RegisterArgs {
   password: string; 
 }
 
+interface QuestionInput {
+  questionText: string;
+  correctAnswer: string;
+  incorrectAnswers: string[];
+}
 interface CreateQuizArgs {
   quizTitle: string;
   creatorName?: string;
   creatorId: string;
-  questions: string[]; 
+  questions: QuestionInput[];
 }
 
 export const resolvers = {
