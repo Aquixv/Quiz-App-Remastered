@@ -15,7 +15,16 @@ export const typeDefs = `#graphql
   correctAnswer: String!
   incorrectAnswers: [String!]!
 }
-
+type Score {
+  _id: ID!
+  userId: ID
+  username: String!
+  score: Int!
+  quizId: Quiz    
+  categoryId: String
+  totalQuestions: Int
+  createdAt: String
+}
 type Quiz {
   _id: ID!
   quizTitle: String!
@@ -31,6 +40,9 @@ type Quiz {
   getQuizByCode(joinCode: String!): Quiz
   getUsers: [User]
   getUser(id: ID!): User
+  getLeaderboard: [Score]
+  getLeaderboardByCategory(categoryId: String!): [Score]
+  getUserHistory(userId: ID!): [Score]
   }
 type AuthPayload {
   token: String!
@@ -45,5 +57,13 @@ type AuthPayload {
     creatorId: ID!
     questions: [QuestionInput!]!
   ): Quiz
+  submitScore(
+    userId: ID
+    username: String!
+    score: Int!
+    quizId: ID
+    categoryId: String
+    totalQuestions: Int
+  ): Score
 }
 `;

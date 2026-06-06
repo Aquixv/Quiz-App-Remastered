@@ -26,8 +26,33 @@ export const resolvers = {
     getUser: async (_: unknown, { id }: { id: string }) => {
       return await User.findById(id);
     },
+    getQuizzes: async () => {
+      return await Quiz.find({}).sort({ createdAt: -1 });
+    },
+    getQuiz: async (_: any, { id }: { id: string }) => {
+      return await Quiz.findById(id);
+    },
+    getQuizByCode: async (_: any, { joinCode }: { joinCode: string }) => {
+      return await Quiz.findOne({ joinCode: joinCode.toUpperCase() });
+    },
+    getLeaderboard: async () => {
+      return await Score.find({})
+        .sort({ score: -1 })
+        .limit(100)
+        .populate('quizId');
   },
-  
+  getLeaderboardByCategory: async (_: any, { categoryId }: { categoryId: string }) => {
+      return await Score.find({ categoryId })
+        .sort({ score: -1 })
+        .limit(100)
+        .populate('quizId');
+    },
+    getUserHistory: async (_: any, { userId }: { userId: string }) => {
+      return await Score.find({ userId })
+        .sort({ createdAt: -1 })
+        .populate('quizId');
+    }
+},
   Mutation: {
     registerUser: async (_: unknown, { username, password }: RegisterArgs) => {
       const saltRounds = 10;
@@ -80,6 +105,17 @@ export const resolvers = {
       });
       
       return await newQuiz.save();
+    },
+    submitScore: async (_: any, args: any) => {
+      const newScore = new Score({
+        userId: args.userId || null, // Null is perfectly fine for guests
+        username: args.username,
+        score: args.score,
+        quizId: args.quizId || null,
+        categoryId: args.categoryId || '9', // Default to General Knowledge
+        totalQuestions: args.totalQuestions || 10
+      });
+      return await newScore.save();
     }
   }
 };
