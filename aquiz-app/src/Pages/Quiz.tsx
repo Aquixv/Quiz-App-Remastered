@@ -86,9 +86,9 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-            console.log("🏆 Score logged successfully!");
+            console.log("Score logged successfully!", score);
         } catch (err) {
-            console.error("❌ Network error saving score:", err);
+            console.error(" Network error saving score:", err);
         }
     };
 
@@ -206,14 +206,14 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        console.log("🏆 Score logged successfully!");
+        console.log(" Score logged successfully!");
         setScoreSaved(true);
         setNeedsNamePrompt(false);
         if (!playerId) {
             localStorage.setItem('user', JSON.stringify({ username: playerName }));
         }
     } catch (err) {
-        console.error("❌ Network error saving score:", err);
+        console.error(" Network error saving score:", err);
     }
 };
 
