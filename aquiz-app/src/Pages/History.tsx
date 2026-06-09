@@ -1,64 +1,68 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import API_BASE_URL from './config';
 import { Score } from '../quiz';
-
+import { gql } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
+interface HistoryProps {
+    getUserHistory: Score[];
+}
 const categoryMap: Record<string, string> = {
-'9': 'General Knowledge',
-'10': 'Entertainment: Books',
-'11': 'Entertainment: Film',
-'12': 'Entertainment: Music',
-'13': 'Entertainment: Musicals & Theatres',
-'14': 'Entertainment: Television',
-'15': 'Entertainment: Video Games',
-'16': 'Entertainment: Board Games',
-'17': 'Science & Nature',
-'18': 'Science: Computers',
-'19': 'Science: Mathematics',
-'20': 'Mythology',
-'21': 'Sports',
-'22': 'Geography',
-'23': 'History',
-'24': 'Politics',
-'25': 'Art',
-'26': 'Celebrities',
-'27': 'Animals',
-'28': 'Vehicles',
-'29': 'Entertainment: Comics',
-'30': 'Science: Gadgets',
-'31': 'Entertainment: Japanese Anime & Manga',
-'32': 'Entertainment: Cartoon & Animations'
+  '9': 'General Knowledge',
+  '10': 'Entertainment: Books',
+  '11': 'Entertainment: Film',
+  '12': 'Entertainment: Music',
+  '13': 'Entertainment: Musicals & Theatres',
+  '14': 'Entertainment: Television',
+  '15': 'Entertainment: Video Games',
+  '16': 'Entertainment: Board Games',
+  '17': 'Science & Nature',
+  '18': 'Science: Computers',
+  '19': 'Science: Mathematics',
+  '20': 'Mythology',
+  '21': 'Sports',
+  '22': 'Geography',
+  '23': 'History',
+  '24': 'Politics',
+  '25': 'Art',
+  '26': 'Celebrities',
+  '27': 'Animals',
+  '28': 'Vehicles',
+  '29': 'Entertainment: Comics',
+  '30': 'Science: Gadgets',
+  '31': 'Anime & Manga',
+  '32': 'Entertainment: Cartoon & Animations'
 };
 
+const FETCH_USER_HISTORY = gql`
+  query GetUserHistory($userId: ID!) {
+    getUserHistory(userId: $userId) {
+      score
+      totalQuestions
+      userId
+      categoryId
+      createdAt
+      quizId {
+        creatorId
+        creatorName
+        quizTitle
+      }
+    }
+  }
+`;
 
 const MyHistory = () => {
-    const [history, setHistory] = useState<Score[]>([]);
-    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
-    
-    useEffect(() => {
-        const userString = localStorage.getItem('user');
-        const localUser = userString ? JSON.parse(userString) : null;
-        const userId = localUser?.id || localUser?._id;
+    const userString = localStorage.getItem('user');
+    const localUser = userString ? JSON.parse(userString) : null;
+    const userId = localUser?.id || localUser?._id;
+    const { data, loading } = useQuery<HistoryProps>(FETCH_USER_HISTORY, {
+        variables: { userId },
+        skip: !userId, 
+    });
 
-        if (userId) {
-            fetch(`${API_BASE_URL}/api/scores/user/${userId}`)
-                .then(res => res.json())
-                .then(data => {
-                    const sortedData = data.sort((a: Score, b: Score) => 
-                        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-                    );
-                    setHistory(sortedData);
-                    setLoading(false); // Turn off the loading text!
-                })
-                .catch(err => {
-                    console.error("Error fetching history:", err);
-                    setLoading(false);
-                });
-        } else {
-            setLoading(false);
-        }
-    }, []);
+    const history: Score[] = data?.getUserHistory 
+        ? [...data.getUserHistory].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        : [];
   
     return (
         <div className="bg-deep-purple min-h-screen p-6 text-lavender-light">
@@ -87,7 +91,7 @@ const MyHistory = () => {
                                         {item.quizId?.quizTitle || `${categoryMap[item.categoryId || '9']} Trivia`}
                                     </h3>
                                     <p className="text-xs text-lavender-light/40 mt-1 uppercase tracking-widest">
-                                        {new Date(item.createdAt).toLocaleDateString()}
+                                        {new Date(parseInt(item.createdAt)).toLocaleDateString()}
                                     </p>
                                 </div>
                             </div>

@@ -1,40 +1,57 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Home.css';
-import { User } from '../quiz';
 import { QuizSettingsState } from '../App';
 import AuthModal from './AuthModal';
-import API_BASE_URL from './config';
+import { gql } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
+
 interface HomeProps {
     setQuizSettings: React.Dispatch<React.SetStateAction<QuizSettingsState>>;
 }
+interface TopScoresResponse {
+  getLeaderboard: {
+    username: string;
+    score: number;
+  }[];
+}
+const GET_TOP_SCORES = gql`
+  query GetTopScores {
+    getLeaderboard {
+      username
+      score
+    }
+  }
+`;
 
 const Home = () => {
   const navigate = useNavigate();
   const [showAllCategories, setShowAllCategories] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || '{}')?.username || null);
-const [topUsers, setTopUsers] = useState<User[]>([]);
+  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || '{}')?.username || null);
+  
   const [quizSettings, setQuizSettings] = useState<QuizSettingsState>({
     amount: 10,
     category: '9', 
     difficulty: 'easy'
   });
-  
-useEffect(() => {
-  const fetchTopScorers = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/users/leaderboard`);
-      const data = await response.json();
-      setTopUsers(data); 
-    } catch (err) {
-      console.error("Couldn't fetch leaderboard");
-    }
+  const { data: scoreData, loading: scoresLoading } = useQuery<TopScoresResponse>(GET_TOP_SCORES, {
+    fetchPolicy: 'cache-and-network' 
+  });
+  const getTopUniqueUsers = () => {
+    if (!scoreData?.getLeaderboard) return [];
+    const unique = new Map();
+    scoreData.getLeaderboard.forEach((item: any) => {
+        if (!unique.has(item.username) || item.score > unique.get(item.username).score) {
+            unique.set(item.username, item);
+        }
+    });
+    return Array.from(unique.values())
   };
-  fetchTopScorers();
-}, []);
 
-const categories = [
+  const topUsers = getTopUniqueUsers();
+
+  const categories = [
     { id: '17', icon: 'science', label: 'Science & Nature' },
     { id: '23', icon: 'history_edu', label: 'History' },
     { id: '11', icon: 'movie_filter', label: 'Film & Media' },
@@ -43,40 +60,40 @@ const categories = [
     { id: '25', icon: 'palette', label: 'Art' },
     { id: '31', icon: 'auto_awesome', label: 'Anime & Manga' } 
   ];
-const handleQuickStart = (categoryId: string) => {
-        setQuizSettings({
-            amount: 10,
-            category: categoryId,
-            difficulty: 'medium' 
-        });
-        navigate('/quiz');
-    };
+
+  const handleQuickStart = (categoryId: string) => {
+    setQuizSettings({
+        amount: 10,
+        category: categoryId,
+        difficulty: 'medium' 
+    });
+    navigate('/quiz');
+  };
+
   return (
     <div className="bg-deep-purple text-lavender-light min-h-screen flex flex-col font-display">
       <div className="relative flex h-full w-full flex-col overflow-x-hidden">
         <header className="flex items-center bg-deep-purple/80 backdrop-blur-md p-4 sticky top-0 z-10 border-b border-glass-border">
+          <h2 className="text-white text-2xl md:text-4xl font-bold leading-tight tracking-tight flex-1 text-center">
+            QuizMaster
+          </h2>
 
-  <h2 className="text-white text-2xl md:text-4xl font-bold leading-tight tracking-tight flex-1 text-center">
-    QuizMaster
-  </h2>
-
-  <div className="flex items-center gap-3">
-    {user ? (
-      <div className="flex flex-col items-end">
-        <span className="text-[10px] uppercase font-bold text-lavender-light/40">Player</span>
-        <span className="text-sm font-bold text-neon-yellow">@{user}</span>
-      </div>
-    ) : (
-      <button 
-        onClick={() => setIsAuthOpen(true)}
-        className="text-xs font-bold uppercase text-neon-yellow border border-electric-violet/30 px-3 py-2 rounded-xl hover:text-electric-violet bg-electric-violet/10 transition-all"
-      >
-        Login
-      </button>
-    )}
-    
-  </div>
-</header>
+          <div className="flex items-center gap-3">
+            {user ? (
+              <div className="flex flex-col items-end">
+                <span className="text-[10px] uppercase font-bold text-lavender-light/40">Player</span>
+                <span className="text-sm font-bold text-neon-yellow">@{user}</span>
+              </div>
+            ) : (
+              <button 
+                onClick={() => setIsAuthOpen(true)}
+                className="text-xs font-bold uppercase text-neon-yellow border border-electric-violet/30 px-3 py-2 rounded-xl hover:text-electric-violet bg-electric-violet/10 transition-all"
+              >
+                Login
+              </button>
+            )}
+          </div>
+        </header>
 
         <main className="flex-1 pb-24">
           <section className="px-6 pt-8 pb-6 text-center">
@@ -110,31 +127,31 @@ const handleQuickStart = (categoryId: string) => {
 
           <section className="px-6 py-4">
             <div className="flex items-center justify-between mb-6 px-2">
-  <h3 className="text-2xl font-bold text-white tracking-tight">Categories</h3>
-  <button 
-    onClick={() => setShowAllCategories(!showAllCategories)}
-    className="bg-electric-violet/10 hover:bg-electric-violet/20 px-4 py-2 rounded-full text-electric-violet text-sm font-bold flex items-center gap-2 transition-all"
-  >
-    {showAllCategories ? 'Show Less' : `See All (${categories.length})`}
-    <span className={`material-symbols-outlined !text-xl transition-transform duration-300 ${showAllCategories ? 'rotate-180' : ''}`}>
-      keyboard_arrow_down
-    </span>
-  </button>
-</div>
+              <h3 className="text-2xl font-bold text-white tracking-tight">Categories</h3>
+              <button 
+                onClick={() => setShowAllCategories(!showAllCategories)}
+                className="bg-electric-violet/10 hover:bg-electric-violet/20 px-4 py-2 rounded-full text-electric-violet text-sm font-bold flex items-center gap-2 transition-all"
+              >
+                {showAllCategories ? 'Show Less' : `See All (${categories.length})`}
+                <span className={`material-symbols-outlined !text-xl transition-transform duration-300 ${showAllCategories ? 'rotate-180' : ''}`}>
+                  keyboard_arrow_down
+                </span>
+              </button>
+            </div>
             <div className={`grid grid-cols-3 gap-6 transition-all duration-500 overflow-hidden ${showAllCategories ? 'max-h-[1000px]' : 'max-h-[160px]'}`}>
-{categories.map((cat, i) => (
-  <div 
-    key={i} 
-    className="flex flex-col items-center gap-3 mb-6 group cursor-pointer"
-    onClick={() => handleQuickStart(cat.id)} 
-  >
-    <div className="w-20 h-20 rounded-3xl bg-white/5 backdrop-blur-xl flex items-center justify-center text-electric-violet group-hover:bg-electric-violet/20 transition-all">
-      <span className="material-symbols-outlined !text-[40px]">{cat.icon}</span>
-    </div>
-    <span className="text-sm font-bold text-lavender-light/90">{cat.label}</span>
-  </div>
-))}
-</div>
+              {categories.map((cat, i) => (
+                <div 
+                  key={i} 
+                  className="flex flex-col items-center gap-3 mb-6 group cursor-pointer"
+                  onClick={() => handleQuickStart(cat.id)} 
+                >
+                  <div className="w-20 h-20 rounded-3xl bg-white/5 backdrop-blur-xl flex items-center justify-center text-electric-violet group-hover:bg-electric-violet/20 transition-all">
+                    <span className="material-symbols-outlined !text-[40px]">{cat.icon}</span>
+                  </div>
+                  <span className="text-sm font-bold text-lavender-light/90">{cat.label}</span>
+                </div>
+              ))}
+            </div>
           </section>
 
           <section className="px-6 py-6">
@@ -143,26 +160,28 @@ const handleQuickStart = (categoryId: string) => {
                 <h3 className="text-lg font-bold text-white">Top Total Scorers</h3>
                 <span className="material-symbols-outlined text-neon-yellow">emoji_events</span>
               </div>
-            <div className="space-y-4">
-  {topUsers.length > 0 ? (
-    topUsers.map((u, i) => (
-      <div key={i} className="flex items-center gap-3 group">
-        <div className="size-10 rounded-full bg-electric-violet/20 border border-white/10 overflow-hidden">
-          <img alt={u.username} src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${u.username}`} />
-        </div>
-        <div className="flex-1">
-          <p className="text-sm font-bold text-white">{u.username}</p>
-          <p className="text-xs text-lavender-light/50">{u.totalPoints.toLocaleString()} pts</p>
-        </div>
-        <div className={`font-bold ${i === 0 ? 'text-neon-yellow' : 'text-electric-violet'}`}>
-          #{i + 1}
-        </div>
-      </div>
-    ))
-  ) : (
-    <p className="text-sm text-lavender-light/30 text-center">No scores yet. Be the first!</p>
-  )}
-</div>
+              <div className="space-y-4">
+                {scoresLoading ? (
+                  <p className="text-sm text-lavender-light/50 text-center animate-pulse">Loading legends...</p>
+                ) : topUsers.length > 0 ? (
+                  topUsers.map((u, i) => (
+                    <div key={i} className="flex items-center gap-3 group">
+                      <div className="size-10 rounded-full bg-electric-violet/20 border border-white/10 overflow-hidden">
+                        <img alt={u.username} src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${u.username}`} />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-white">{u.username}</p>
+                        <p className="text-xs text-lavender-light/50">{u.score.toLocaleString()} pts</p>
+                      </div>
+                      <div className={`font-bold ${i === 0 ? 'text-neon-yellow' : 'text-electric-violet'}`}>
+                        #{i + 1}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-lavender-light/30 text-center">No scores yet. Be the first!</p>
+                )}
+              </div>
             </div>
           </section>
         </main>
@@ -173,27 +192,24 @@ const handleQuickStart = (categoryId: string) => {
               <span className="material-symbols-outlined">home</span>
               <p className="text-[10px] font-bold uppercase tracking-wider">Home</p>
             </Link>
-            <button className="flex flex-col items-center gap-1 text-lavender-light/40">
-              <Link to="/leaderboard"><span className="material-symbols-outlined">leaderboard</span>
-              <p className="text-[10px] font-medium uppercase tracking-wider">Leaderboard</p></Link>
-            </button>
-            <button className="flex flex-col items-center gap-1 text-lavender-light/40">
-            <Link to="/profile">
+            <Link to="/leaderboard" className="flex flex-col items-center gap-1 text-lavender-light/40">
+              <span className="material-symbols-outlined">leaderboard</span>
+              <p className="text-[10px] font-medium uppercase tracking-wider">Leaderboard</p>
+            </Link>
+            <Link to="/profile" className="flex flex-col items-center gap-1 text-lavender-light/40">
               <span className="material-symbols-outlined">person</span>
               <p className="text-[10px] font-medium uppercase tracking-wider">Profile</p>
-              </Link>
-            </button>
+            </Link>
           </div>
         </nav>
       </div>
-          <AuthModal 
-  isOpen={isAuthOpen} 
-  onClose={() => setIsAuthOpen(false)} 
-  onAuthSuccess={(username) => setUser(username)} 
-/>
+      <AuthModal 
+        isOpen={isAuthOpen} 
+        onClose={() => setIsAuthOpen(false)} 
+        onAuthSuccess={(username) => setUser(username)} 
+      />
     </div>
   );
-  
 };
 
 export default Home;

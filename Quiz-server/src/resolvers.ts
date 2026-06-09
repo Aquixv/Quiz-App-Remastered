@@ -41,23 +41,55 @@ export const resolvers = {
       return await Quiz.findOne({ joinCode: joinCode.toUpperCase() });
     },
     getLeaderboard: async () => {
-      return await Score.find({})
+      const scores = await Score.find({})
         .sort({ score: -1 })
         .limit(100)
-        .populate('quizId');
-  },
-  getLeaderboardByCategory: async (_: any, { categoryId }: { categoryId: string }) => {
-      return await Score.find({ categoryId })
-        .sort({ score: -1 })
-        .limit(100)
-        .populate('quizId');
+        .populate('quizId')
+        .populate('userId');
+
+      return scores.map((score: any) => {
+        const scoreObj = score.toObject();
+        return {
+          ...scoreObj,
+          userId: score.userId?._id || score.userId || null,
+          username: score.username || score.userId?.username || "Anonymous Player"
+        };
+      });
     },
+
+    getLeaderboardByCategory: async (_: any, { categoryId }: { categoryId: string }) => {
+      const scores = await Score.find({ categoryId })
+        .sort({ score: -1 })
+        .limit(100)
+        .populate('quizId')
+        .populate('userId');
+
+      return scores.map((score: any) => {
+        const scoreObj = score.toObject();
+        return {
+          ...scoreObj,
+          userId: score.userId?._id || score.userId || null,
+          username: score.username || score.userId?.username || "Anonymous Player"
+        };
+      });
+    },
+
     getUserHistory: async (_: any, { userId }: { userId: string }) => {
-      return await Score.find({ userId })
+      const scores = await Score.find({ userId })
         .sort({ createdAt: -1 })
-        .populate('quizId');
+        .populate('quizId')
+        .populate('userId');
+
+      return scores.map((score: any) => {
+        const scoreObj = score.toObject();
+        return {
+          ...scoreObj,
+          userId: score.userId?._id || score.userId || null,
+          username: score.username || score.userId?.username || "Anonymous Player"
+        };
+      });
     }
-},
+  },
   Mutation: {
     registerUser: async (_: unknown, { username, password }: RegisterArgs) => {
       const saltRounds = 10;

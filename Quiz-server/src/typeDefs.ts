@@ -18,7 +18,7 @@ export const typeDefs = `#graphql
 type Score {
   _id: ID!
   userId: ID
-  username: String!
+  username: String
   score: Int!
   quizId: Quiz    
   categoryId: String

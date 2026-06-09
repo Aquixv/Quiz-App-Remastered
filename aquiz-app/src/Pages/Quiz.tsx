@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import API_BASE_URL from './config'; 
 import './Quiz.css';
 import confetti from 'canvas-confetti';
 import Higuruma from '../assets/Higuruma.png';
@@ -8,6 +7,9 @@ import Hesnotreading from '../assets/Not-reading.png';
 import Regret from '../assets/Regret.png';
 import doesheknow from '../assets/doesheknow.png';
 import speed from '../assets/speed.jpg';
+
+import { gql } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 
 interface QuestionData {
     question: string;
@@ -18,6 +20,7 @@ interface QuestionData {
     correctAnswer?: string;
     incorrectAnswers?: string[];
 }
+
 interface QuizLocationState {
     customQuiz?: QuestionData[];
     quizId?: string;
@@ -28,6 +31,13 @@ interface QuizProps {
     amount: number;
     difficulty: string;
 }
+const SUBMIT_SCORE_MUTATION = gql`
+  mutation SubmitScore($userId: ID, $username: String!, $score: Int!, $quizId: ID, $categoryId: String, $totalQuestions: Int) {
+    submitScore(userId: $userId, username: $username, score: $score, quizId: $quizId, categoryId: $categoryId, totalQuestions: $totalQuestions) {
+      _id
+    }
+  }
+`;
 
 const Quiz = ({ category, amount, difficulty }: QuizProps) => {
     const location = useLocation();
@@ -62,36 +72,13 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
     const [needsNamePrompt, setNeedsNamePrompt] = useState(false);
     const [scoreSaved, setScoreSaved] = useState(false);
 
+    const [submitScore] = useMutation(SUBMIT_SCORE_MUTATION);
+
     const Option1 = useRef<HTMLLIElement>(null);
     const Option2 = useRef<HTMLLIElement>(null);
     const Option3 = useRef<HTMLLIElement>(null);
     const Option4 = useRef<HTMLLIElement>(null);
     const option_array = [Option1, Option2, Option3, Option4];
-
-    const submitFinalScore = async () => {
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-    
-        const payload = {
-            userId: user?.id || user?._id || null, 
-            username: user?.username || "Guest", 
-            score: score * 10, 
-            quizId: locationState?.quizId || null,
-            categoryId: category || '9',
-            totalQuestions: data.length
-        };
-
-        try {
-            await fetch(`${API_BASE_URL}/api/scores`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            console.log("Score logged successfully!", score);
-        } catch (err) {
-            console.error(" Network error saving score:", err);
-        }
-    };
-
     useEffect(() => {
         if (data.length > 0) {
             setLoading(false);
@@ -133,11 +120,13 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
     useEffect(() => {
         if (result) localStorage.removeItem('active_quiz');
     }, [result]);
+
     const decodeHTML = (html: string) => {
         const txt = document.createElement("textarea");
         txt.innerHTML = html;
         return txt.value;
     };
+
     const checkAnswer = (e: React.MouseEvent<HTMLLIElement>, ans: string) => {
         if (!lock) {
             const correct = decodeHTML(data[index].correct_answer);
@@ -157,12 +146,42 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
             setLock(true);
         }
     };
+    const executeScoreSubmission = async (playerName: string, playerId: string | null = null) => {
+        try {
+            await submitScore({
+                variables: {
+                    userId: playerId, 
+                    username: playerName, 
+                    score: score * 10, 
+                    quizId: locationState?.quizId || null,
+                    categoryId: category || '9',
+                    totalQuestions: data.length
+                }
+            });
+            console.log("🏆 Score logged via GraphQL!");
+            setScoreSaved(true);
+            setNeedsNamePrompt(false);
+            
+            if (!playerId) {
+                localStorage.setItem('user', JSON.stringify({ username: playerName }));
+            }
+        } catch (err) {
+            console.error("GraphQL mutation failed:", err);
+        }
+    };
 
     const next1 = () => {
         if (lock) {
             if (index === data.length - 1) {
                 setResult(true);
-                submitFinalScore();
+                const userString = localStorage.getItem('user');
+                const localUser = userString ? JSON.parse(userString) : null;
+                
+                if (localUser && localUser.username) {
+                    executeScoreSubmission(localUser.username, localUser.id || localUser._id);
+                } else {
+                    setNeedsNamePrompt(true);
+                }
                 return;
             }
             setIndex(prev => prev + 1);
@@ -192,31 +211,6 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
 
     const feedback = getFeedback();
 
-    const handleScoreSubmission = async (playerName: string, playerId: string | null = null) => {
-    const payload = {
-        userId: playerId, 
-        username: playerName, 
-        score: score * 10, 
-        quizId: locationState?.quizId || null,
-        categoryId: category || '9',
-        totalQuestions: data.length
-    };try {
-        await fetch(`${API_BASE_URL}/api/scores`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        console.log(" Score logged successfully!");
-        setScoreSaved(true);
-        setNeedsNamePrompt(false);
-        if (!playerId) {
-            localStorage.setItem('user', JSON.stringify({ username: playerName }));
-        }
-    } catch (err) {
-        console.error(" Network error saving score:", err);
-    }
-};
-
     return (
         <div className='container'>
             {result ? (
@@ -224,6 +218,37 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
                     <img src={feedback.gif} alt="Reaction" className="result-gif" />
                     <h2 style={{ color: feedback.color }}>{feedback.msg}</h2>
                     <h3 style={{display:'flex', alignItems:'center', gap:'10px'}}>{score*10} Points! <img style={{width:'5vw', height:'10vh'}} src="https://www.svgrepo.com/show/513363/trophy.svg" alt="" /></h3>
+                    {needsNamePrompt && !scoreSaved && (
+                        <div className="w-full mt-6 p-5 bg-black/20 border border-electric-violet/30 rounded-2xl">
+                            <p className="text-sm font-bold text-white mb-3 text-center">Claim Your Leaderboard Spot!</p>
+                            <div className="flex gap-2">
+                                <input 
+                                    type="text" 
+                                    placeholder="Enter Name..." 
+                                    value={guestName}
+                                    onChange={(e) => setGuestName(e.target.value)}
+                                    maxLength={15}
+                                    className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-2 text-white outline-none focus:border-electric-violet"
+                                />
+                                <button 
+                                    onClick={() => {
+                                        if (guestName.trim().length > 0) {
+                                            executeScoreSubmission(guestName.trim());
+                                        }
+                                    }}
+                                    disabled={!guestName.trim()}
+                                    className="bg-neon-yellow text-deep-purple font-bold px-4 py-2 rounded-xl disabled:opacity-50"
+                                >
+                                    Save
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {scoreSaved && (
+                        <p className="text-neon-yellow font-bold mt-4">Score saved to the Hall of Fame! 🏆</p>
+                    )}
+
                     <div className='result-buttons'>
                         <button className="w-full max-w-[250px] py-4 mt-2 rounded-xl font-bold transition-all duration-300 backdrop-blur-md bg-electric-violet/20 border border-electric-violet/50 text-white hover:bg-electric-violet/40 hover:shadow-[0_0_15px_rgba(139,92,246,0.3)]" onClick={() => navigate('/setup')}>New Quiz?</button>
                         <button className="w-full max-w-[250px] py-4 mt-2 rounded-xl font-bold transition-all duration-300 backdrop-blur-md bg-electric-violet/20 border border-electric-violet/50 text-white hover:bg-electric-violet/40 hover:shadow-[0_0_15px_rgba(139,92,246,0.3)]" onClick={() => navigate('/')}>Home</button>

@@ -1,14 +1,33 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import API_BASE_URL from './config';
-import { Question, Quiz, User } from '../quiz';
+import { gql } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
+interface CreateQuizResponse {
+  createQuiz: {
+    _id: string;
+    joinCode: string;
+    quizTitle: string;
+  }
+}
+const CREATE_QUIZ_MUTATION = gql`
+  mutation CreateQuiz($quizTitle: String!, $questions: [QuestionInput!]!) {
+    createQuiz(quizTitle: $quizTitle, questions: $questions) {
+      _id
+      joinCode
+      quizTitle
+    }
+  }
+`;
+
 const CreateQuiz = () => {
   const navigate = useNavigate();
   const [quizTitle, setQuizTitle] = useState('');
   const [questions, setQuestions] = useState([
     { questionText: '', correctAnswer: '', incorrectAnswers: ['', '', ''] }
   ]);
-  const [generatedCode, setGeneratedCode] = useState(null);
+  const [generatedCode, setGeneratedCode] = useState<string | null>(null);
+
+  const [createQuiz, { loading }] = useMutation<CreateQuizResponse>(CREATE_QUIZ_MUTATION);
 
   const addQuestion = () => {
     setQuestions([...questions, { questionText: '', correctAnswer: '', incorrectAnswers: ['', '', ''] }]);
@@ -19,42 +38,42 @@ const CreateQuiz = () => {
     const updated = questions.filter((_, i) => i !== index);
     setQuestions(updated);
   };
-
-const user = JSON.parse(localStorage.getItem('user') || '{}');
-const quizData = {
-    quizTitle: quizTitle,
-    questions: questions,
-    creatorName: user.username,
-    creatorId: user.id || user._id 
-};
-
-const handleInputChange = (
+  const handleInputChange = (
     index: number, 
-    field: keyof Question, 
+    field: string, 
     value: string, 
     subIndex: number | null = null
   ) => {
     const updatedQuestions = [...questions];
-  }
+    
+    if (field === 'incorrectAnswers' && subIndex !== null) {
+      updatedQuestions[index].incorrectAnswers[subIndex] = value;
+    } else {
+      (updatedQuestions[index] as any)[field] = value;
+    }
+    
+    setQuestions(updatedQuestions);
+  };
 
   const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
-   if (e) e.preventDefault();
+    if (e) e.preventDefault();
     try {
-      const response = await fetch(`${API_BASE_URL}/api/quizzes`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(quizData)
-});
-      const data = await response.json();
-      if (response.ok) {
-        setGeneratedCode(data.joinCode);
+      const { data } = await createQuiz({
+        variables: {
+          quizTitle: quizTitle,
+          questions: questions
+        }
+      });
+
+      if (data) {
+        setGeneratedCode(data.createQuiz.joinCode);
       }
     } catch (err) {
       console.error("Error saving quiz:", err);
     }
   };
 
-const copyToClipboard = () => {
+  const copyToClipboard = () => {
     if (generatedCode) {
         navigator.clipboard.writeText(generatedCode);
     }
@@ -92,11 +111,11 @@ const copyToClipboard = () => {
   return (
     <div className="bg-deep-purple min-h-screen p-6 text-lavender-light font-display pb-32">
       <button 
-                    onClick={() => navigate('/myquizzes')} 
-                    className="material-symbols-outlined mr-4 hover:text-white transition-colors"
-                >
-                    arrow_back
-                </button>
+          onClick={() => navigate('/myquizzes')} 
+          className="material-symbols-outlined mr-4 hover:text-white transition-colors"
+      >
+          arrow_back
+      </button>
       <h1 className="text-3xl font-bold mb-6 text-white text-center">Create Custom Quiz</h1>
       <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
         <input 
@@ -147,11 +166,15 @@ const copyToClipboard = () => {
           </div>
         ))}
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 flex gap-4 w-full max-w-lg px-6 z-50">
-          <button type="button" onClick={addQuestion} className="flex-1 h-16 rounded-2xl bg-deep-purple border-2 border-electric-violet text-electric-violet font-bold backdrop-blur-xl">
+          <button type="button" onClick={addQuestion} className="flex-1 h-16 rounded-2xl bg-deep-purple border-2 border-electric-violet text-electric-violet font-bold backdrop-blur-xl transition-all">
             + Add Question
           </button>
-          <button type="submit" className="flex-1 h-16 rounded-2xl bg-neon-yellow text-deep-purple font-bold shadow-xl shadow-neon-yellow/20">
-            Publish Quiz
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="flex-1 h-16 rounded-2xl bg-neon-yellow text-deep-purple font-bold shadow-xl shadow-neon-yellow/20 disabled:opacity-50 transition-all"
+          >
+            {loading ? 'Publishing...' : 'Publish Quiz'}
           </button>
         </div>
       </form>

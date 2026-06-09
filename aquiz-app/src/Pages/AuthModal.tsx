@@ -98,7 +98,7 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess }: AuthModalProps) => {
         
         <div className="relative z-10">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-white">{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
+            <h2 className="text-2xl font-bold text-white">{isLogin ? 'Welcome Back!' : 'Create Account'}</h2>
             <button onClick={onClose} className="text-lavender-light/50 hover:text-white">
               <span className="material-symbols-outlined">close</span>
             </button>
