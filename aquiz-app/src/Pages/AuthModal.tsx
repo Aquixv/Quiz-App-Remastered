@@ -1,42 +1,95 @@
+import React, { useState } from 'react';
+import { gql } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
+
 interface AuthModalProps {
   isOpen: boolean;
-  onClose: () => void; 
-  onAuthSuccess: (username: string) => void; 
+  onClose: () => void;
+  onAuthSuccess: (username: string) => void;
 }
-import React, { useState } from 'react';
-import API_BASE_URL from './config';
+interface LoginResponse {
+  loginUser: {
+    token: string;
+    user: {
+      _id: string;
+      username: string;
+    };
+  };
+}
+
+interface RegisterResponse {
+  registerUser: {
+    _id: string;
+    username: string;
+  };
+}
+
+const LOGIN_MUTATION = gql`
+  mutation Login($username: String!, $password: String!) {
+    loginUser(username: $username, password: $password) {
+      token
+      user {
+        _id
+        username
+      }
+    }
+  }
+`;
+
+const REGISTER_MUTATION = gql`
+  mutation Register($username: String!, $password: String!) {
+    registerUser(username: $username, password: $password) {
+      _id
+      username
+    }
+  }
+`;
 
 const AuthModal = ({ isOpen, onClose, onAuthSuccess }: AuthModalProps) => {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
 
+  const [loginUser, { loading: loginLoading }] = useMutation<LoginResponse>(LOGIN_MUTATION);
+  const [registerUser, { loading: registerLoading }] = useMutation<RegisterResponse>(REGISTER_MUTATION);
+
   if (!isOpen) return null;
 
   const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
-   if (e) e.preventDefault();
+    if (e) e.preventDefault();
     setError('');
-    const endpoint = isLogin ? '/api/login' : '/api/signup';
-    
-    try {
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-      const data = await response.json();
 
-      if (response.ok) {
-        localStorage.setItem('user', JSON.stringify({ username: data.username, id: data.id }));
-        onAuthSuccess(data.username);
+    try {
+    if (isLogin) {
+      const { data } = await loginUser({ variables: formData });
+      if (data) {
+        const { token, user } = data.loginUser;
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify({ username: user.username, id: user._id }));
+        
+        onAuthSuccess(user.username);
         onClose();
-      } else {
-        setError(data.error || 'Something went wrong');
       }
-    } catch (err) {
-      setError('Server connection failed');
+    } else {
+       await registerUser({ variables: formData });
+      
+      const { data } = await loginUser({ variables: formData });
+      
+      if (data) {
+        const { token, user } = data.loginUser;
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify({ username: user.username, id: user._id }));
+        
+        onAuthSuccess(user.username);
+        onClose();
+      }
     }
-  };
+  } catch (err: any) {
+    setError(err.message || 'Server connection failed');
+  }
+};
+
+  const isProcessing = loginLoading || registerLoading;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -73,13 +126,21 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess }: AuthModalProps) => {
               />
             </div>
 
-            <button type="submit" className="w-full h-14 bg-neon-yellow text-deep-purple font-bold rounded-xl shadow-lg shadow-neon-yellow/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
-              {isLogin ? 'Login' : 'Sign Up'}
+            <button 
+                type="submit" 
+                disabled={isProcessing}
+                className="w-full h-14 bg-neon-yellow text-deep-purple font-bold rounded-xl shadow-lg shadow-neon-yellow/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isProcessing ? 'Processing...' : (isLogin ? 'Login' : 'Sign Up')}
             </button>
           </form>
 
           <button 
-            onClick={() => setIsLogin(!isLogin)}
+            type="button"
+            onClick={() => {
+                setIsLogin(!isLogin);
+                setError('');
+            }}
             className="w-full mt-6 text-sm text-lavender-light/60 hover:text-electric-violet transition-colors"
           >
             {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Login"}
