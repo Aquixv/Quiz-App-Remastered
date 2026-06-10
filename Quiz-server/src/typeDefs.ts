@@ -53,8 +53,6 @@ type AuthPayload {
   loginUser(username: String!, password: String!): AuthPayload
   createQuiz(
     quizTitle: String!
-    creatorName: String
-    creatorId: ID!
     questions: [QuestionInput!]!
   ): Quiz
   submitScore(

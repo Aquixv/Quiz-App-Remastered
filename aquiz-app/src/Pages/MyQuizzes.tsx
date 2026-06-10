@@ -1,61 +1,84 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import API_BASE_URL from './config';
+import { gql } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { Quiz } from '../quiz';
 
+interface DeltQuiz {
+  deleteQuiz: boolean;
+  getQuizzes: Quiz[];
+}
+
+const QUERY_FETCHQUIZ = gql`
+  query GetQuizzes {
+    getQuizzes {
+      _id
+      quizTitle
+      joinCode
+      creatorName
+      createdAt
+      questions {
+        questionText
+        correctAnswer
+        incorrectAnswers
+      }
+    }
+  }
+`;
+
+const DELETE_QUIZ_MUTATION = gql`
+  mutation DeleteQuiz($id: ID!) {
+    deleteQuiz(id: $id)
+  }
+`;
+
 const MyQuizzes = () => {
-    const [quizzes, setQuizzes] = useState<Quiz[]>([]);;
-    const [loading, setLoading] = useState(true);
+    const [quizzes, setQuizzes] = useState<Quiz[]>([]);
     const navigate = useNavigate();
-    const [generatedCode, setGeneratedCode] = useState(null);
     
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const userId = user?.id || user?._id;
-    
-     const copyToClipboard = () => {
-    if (generatedCode) {
-        navigator.clipboard.writeText(generatedCode);
-    }
-  };
+    const { data, loading: queryLoading, error } = useQuery<DeltQuiz>(QUERY_FETCHQUIZ, {
+        fetchPolicy: 'network-only'
+    });
 
+    const [deleteQuiz] = useMutation<DeltQuiz>(DELETE_QUIZ_MUTATION);
+
+    // Security redirect
     useEffect(() => {
         if (!userId) {
             navigate('/');
-            return;
         }
-        fetchQuizzes();
-    }, [userId]); 
+    }, [userId, navigate]); 
 
-    const fetchQuizzes = async () => {
-        try {
-            setLoading(true);
-            const res = await fetch(`${API_BASE_URL}/api/my-quizzes/${userId}`);
-            const data = await res.json();
-            
-            console.log("Fetched Quizzes:", data); 
-            
-            setQuizzes(Array.isArray(data) ? data : []);
-        } catch (err) {
-            console.error("Error fetching quizzes:", err);
-        } finally {
-            setLoading(false);
+    useEffect(() => {
+        if (data?.getQuizzes) {
+            setQuizzes(data.getQuizzes);
+        }
+    }, [data]);
+
+    const copyToClipboard = (code: string) => {
+        if (code) {
+            navigator.clipboard.writeText(code);
+            // alert(`Code ${code} copied to clipboard!`);
         }
     };
 
-    const handleDelete = async (id : number) => {
+    const handleDelete = async (id: string) => {
         if (window.confirm("Are you sure you want to delete this quiz?")) {
             try {
-                const res = await fetch(`${API_BASE_URL}/api/quizzes/${id}`, { 
-                    method: 'DELETE' 
-                });
-                if (res.ok) {
-                    setQuizzes(prev => prev.filter(q => q._id !== id));
+                const { data: mutationData } = await deleteQuiz({ variables: { id } });
+                if (mutationData?.deleteQuiz) {
+                    setQuizzes(prev => prev.filter(q => q._id)); 
                 }
-            } catch (err) {
-                alert("Failed to delete quiz.");
+            } catch (err: any) {
+                alert(err.message || "Failed to delete quiz.");
             }
         }
     };
+
+    // Combine your initial auth validation check with the Apollo network loader
+    const isLoaderVisible = queryLoading && quizzes.length === 0;
 
     return (
         <div className="bg-deep-purple min-h-screen p-6 text-lavender-light">
@@ -70,20 +93,22 @@ const MyQuizzes = () => {
             </header>
 
             <div className="space-y-4">
-                {loading ? (
-                    <div className="text-center py-20 opacity-50">Loading your creations...</div>
+                {isLoaderVisible ? (
+                    <div className="text-center py-20 opacity-50 animate-pulse">Loading your creations...</div>
+                ) : error ? (
+                    <div className="text-center py-20 text-red-400">Failed to sync with the server.</div>
                 ) : quizzes.length > 0 ? (
                     quizzes.map(quiz => (
                         <div key={quiz._id} className="glass-card p-5 rounded-2xl border border-white/10 flex justify-between items-center bg-white/5">
                             <div>
                                 <h3 className="font-bold text-white text-lg">{quiz.quizTitle}</h3>
                                 <p className="text-xs text-lavender-light/40 mt-1">
-                                    CODE: <span onClick={copyToClipboard} className="text-neon-yellow font-mono font-bold tracking-widest uppercase">{quiz.joinCode}</span>
+                                    CODE: <span onClick={() => copyToClipboard(quiz.joinCode)} className="text-neon-yellow font-mono font-bold tracking-widest uppercase cursor-pointer hover:underline">{quiz.joinCode}</span>
                                 </p>
                             </div>
                             <div className="flex gap-2">
                                 <button 
-                                    onClick={() => handleDelete(quiz._id)} 
+                                    onClick={() => handleDelete(quiz.id)} 
                                     className="p-2 text-white/20 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all"
                                     title="Delete Quiz"
                                 >

@@ -15,6 +15,11 @@ const CREATE_QUIZ_MUTATION = gql`
       _id
       joinCode
       quizTitle
+      questions {
+        questionText
+        correctAnswer
+        incorrectAnswers
+      }
     }
   }
 `;
@@ -56,22 +61,22 @@ const CreateQuiz = () => {
   };
 
   const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
-    if (e) e.preventDefault();
-    try {
-      const { data } = await createQuiz({
-        variables: {
-          quizTitle: quizTitle,
-          questions: questions
-        }
-      });
-
-      if (data) {
-        setGeneratedCode(data.createQuiz.joinCode);
+  if (e) e.preventDefault();
+  try {
+    const { data } = await createQuiz({
+      variables: {
+        quizTitle: quizTitle,
+        questions: questions
       }
-    } catch (err) {
-      console.error("Error saving quiz:", err);
+    });
+
+    if (data) {
+      setGeneratedCode(data.createQuiz.joinCode);
     }
-  };
+  } catch (err) {
+    console.error("Error saving quiz:", err);
+  }
+};
 
   const copyToClipboard = () => {
     if (generatedCode) {
