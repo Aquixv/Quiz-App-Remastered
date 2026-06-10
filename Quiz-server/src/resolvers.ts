@@ -153,6 +153,24 @@ export const resolvers = {
         totalQuestions: args.totalQuestions || 10
       });
       return await newScore.save();
+    },
+    deleteQuiz: async (_: any, { id }: { id: string }, context: MyContext) => {
+      if (!context.user) {
+        throw new GraphQLError('You must be logged in to delete a quiz.', {
+          extensions: { code: 'UNAUTHENTICATED' },
+        });
+      }
+      const quiz = await Quiz.findById(id);
+      if (!quiz) {
+        throw new Error("Quiz not found");
+      }
+      if (quiz.creatorId.toString() !== context.user.userId) {
+        throw new GraphQLError('You are not authorized to delete this quiz.', {
+          extensions: { code: 'FORBIDDEN' },
+        });
+      }
+      await Quiz.findByIdAndDelete(id);
+      return true;
     }
   }
 };

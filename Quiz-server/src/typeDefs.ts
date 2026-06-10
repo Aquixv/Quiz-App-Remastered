@@ -65,5 +65,6 @@ type AuthPayload {
     categoryId: String
     totalQuestions: Int
   ): Score
+  deleteQuiz(id: ID!): Boolean!
 }
 `;
