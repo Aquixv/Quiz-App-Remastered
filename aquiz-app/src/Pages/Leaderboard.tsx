@@ -68,7 +68,7 @@ const Leaderboard = () => {
             <div className="space-y-4 mb-24">
                 {loading ? (
                     <div className="text-center py-20 opacity-50 animate-pulse">
-                        Consulting the Hall of Fame...
+                        Loading...
                     </div>
                 ) : displayScores.length > 0 ? (
                     displayScores.map((s, i) => (

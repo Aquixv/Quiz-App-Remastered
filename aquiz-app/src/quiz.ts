@@ -10,7 +10,7 @@ export interface Quiz {
     joinCode: string;
     name: string;
     questions: Question[];
-    _id: number;
+    _id: string;
 }
 
 export interface User {

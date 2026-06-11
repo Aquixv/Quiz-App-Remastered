@@ -6,9 +6,10 @@ import { Quiz } from '../quiz';
 
 interface DeltQuiz {
   deleteQuiz: boolean;
-  getQuizzes: Quiz[];
 }
-
+interface QuizResponse {
+getQuizzes: Quiz[];
+}
 const QUERY_FETCHQUIZ = gql`
   query GetQuizzes {
     getQuizzes {
@@ -38,13 +39,11 @@ const MyQuizzes = () => {
     
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const userId = user?.id || user?._id;
-    const { data, loading: queryLoading, error } = useQuery<DeltQuiz>(QUERY_FETCHQUIZ, {
+    const { data, loading: queryLoading, error } = useQuery<QuizResponse>(QUERY_FETCHQUIZ, {
         fetchPolicy: 'network-only'
     });
 
     const [deleteQuiz] = useMutation<DeltQuiz>(DELETE_QUIZ_MUTATION);
-
-    // Security redirect
     useEffect(() => {
         if (!userId) {
             navigate('/');
@@ -60,24 +59,21 @@ const MyQuizzes = () => {
     const copyToClipboard = (code: string) => {
         if (code) {
             navigator.clipboard.writeText(code);
-            // alert(`Code ${code} copied to clipboard!`);
         }
     };
 
     const handleDelete = async (id: string) => {
-        if (window.confirm("Are you sure you want to delete this quiz?")) {
-            try {
-                const { data: mutationData } = await deleteQuiz({ variables: { id } });
-                if (mutationData?.deleteQuiz) {
-                    setQuizzes(prev => prev.filter(q => q._id)); 
-                }
-            } catch (err: any) {
-                alert(err.message || "Failed to delete quiz.");
+    if (window.confirm("Are you sure you want to delete this quiz?")) {
+        try {
+            const { data } = await deleteQuiz({ variables: { id } });
+            if (data?.deleteQuiz) {
+                setQuizzes(prev => prev.filter(q => q._id !== id)); 
             }
+        } catch (err: any) {
+            alert(err.message || "Failed to delete quiz.");
         }
-    };
-
-    // Combine your initial auth validation check with the Apollo network loader
+    }
+};
     const isLoaderVisible = queryLoading && quizzes.length === 0;
 
     return (
@@ -108,7 +104,7 @@ const MyQuizzes = () => {
                             </div>
                             <div className="flex gap-2">
                                 <button 
-                                    onClick={() => handleDelete(quiz.id)} 
+                                    onClick={() => handleDelete(quiz._id)} 
                                     className="p-2 text-white/20 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all"
                                     title="Delete Quiz"
                                 >
