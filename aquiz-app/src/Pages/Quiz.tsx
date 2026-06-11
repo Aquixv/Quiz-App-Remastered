@@ -217,10 +217,10 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
                 <div className="result-container">
                     <img src={feedback.gif} alt="Reaction" className="result-gif" />
                     <h2 style={{ color: feedback.color }}>{feedback.msg}</h2>
-                    <h3 style={{display:'flex', alignItems:'center', gap:'10px'}}>{score*10} Points! <img style={{width:'5vw', height:'10vh'}} src="https://www.svgrepo.com/show/513363/trophy.svg" alt="" /></h3>
+                    <h3 style={{display:'flex', alignItems:'center', gap:'10px'}}>{score*10} Points!</h3>
                     {needsNamePrompt && !scoreSaved && (
                         <div className="w-full mt-6 p-5 bg-black/20 border border-electric-violet/30 rounded-2xl">
-                            <p className="text-sm font-bold text-white mb-3 text-center">Claim Your Leaderboard Spot!</p>
+                            <p className="text-sm font-bold text-white mb-3 text-center">Enter a name for the leaderboard</p>
                             <div className="flex gap-2">
                                 <input 
                                     type="text" 
@@ -245,9 +245,9 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
                         </div>
                     )}
 
-                    {scoreSaved && (
+                    {/* {scoreSaved && (
                         <p className="text-neon-yellow font-bold mt-4">Score saved to the Hall of Fame! 🏆</p>
-                    )}
+                    )} */}
 
                     <div className='result-buttons'>
                         <button className="w-full max-w-[250px] py-4 mt-2 rounded-xl font-bold transition-all duration-300 backdrop-blur-md bg-electric-violet/20 border border-electric-violet/50 text-white hover:bg-electric-violet/40 hover:shadow-[0_0_15px_rgba(139,92,246,0.3)]" onClick={() => navigate('/setup')}>New Quiz?</button>

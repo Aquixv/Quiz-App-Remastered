@@ -162,7 +162,7 @@ const Home = () => {
               </div>
               <div className="space-y-4">
                 {scoresLoading ? (
-                  <p className="text-sm text-lavender-light/50 text-center animate-pulse">Loading legends...</p>
+                  <p className="text-sm text-lavender-light/50 text-center animate-pulse">Loading...</p>
                 ) : topUsers.length > 0 ? (
                   topUsers.map((u, i) => (
                     <div key={i} className="flex items-center gap-3 group">
