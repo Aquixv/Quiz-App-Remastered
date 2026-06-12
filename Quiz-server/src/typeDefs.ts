@@ -51,6 +51,7 @@ type AuthPayload {
   type Mutation {
   registerUser(username: String!, password: String!): User
   loginUser(username: String!, password: String!): AuthPayload
+  claimScores(scoreIds: [ID!]!): User!
   createQuiz(
     quizTitle: String!
     questions: [QuestionInput!]!

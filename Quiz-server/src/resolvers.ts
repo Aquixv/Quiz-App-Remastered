@@ -171,6 +171,28 @@ getLeaderboardByCategory: async (_: any, { categoryId }: { categoryId: string })
       }
       await Quiz.findByIdAndDelete(id);
       return true;
-    }
+    },
+    claimScores: async (_: any, { scoreIds }: { scoreIds: string[] }, context: MyContext) => {
+  if (!context.user) {
+    throw new GraphQLError('You must be logged in to claim scores.', {
+      extensions: { code: 'UNAUTHENTICATED' },
+    });
+  }
+
+  await Score.updateMany(
+    { _id: { $in: scoreIds }, userId: null },
+    { $set: { userId: context.user.userId, username: context.user.username } }
+  );
+  const userScores = await Score.find({ userId: context.user.userId });
+  const newTotalPoints = userScores.reduce((sum, item) => sum + item.score, 0);
+
+  const updatedUser = await User.findByIdAndUpdate(
+    context.user.userId,
+    { $set: { totalPoints: newTotalPoints } },
+    { new: true }
+  );
+
+  return updatedUser;
+}
   }
 };
