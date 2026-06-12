@@ -41,38 +41,38 @@ export const resolvers = {
       return await Quiz.findOne({ joinCode: joinCode.toUpperCase() });
     },
     getLeaderboard: async () => {
-      const scores = await Score.find({})
-        .sort({ score: -1 })
-        .limit(100)
-        .populate('quizId')
-        .populate('userId');
+  const scores = await Score.find({ quizId: null }) 
+    .sort({ score: -1 })
+    .limit(100)
+    .populate('quizId')
+    .populate('userId');
 
-      return scores.map((score: any) => {
-        const scoreObj = score.toObject();
-        return {
-          ...scoreObj,
-          userId: score.userId?._id || score.userId || null,
-          username: score.username || score.userId?.username || "Anonymous Player"
-        };
-      });
-    },
+  return scores.map((score: any) => {
+    const scoreObj = score.toObject();
+    return {
+      ...scoreObj,
+      userId: score.userId?._id || score.userId || null,
+      username: score.username || score.userId?.username || "Anonymous Player"
+    };
+  });
+},
 
-    getLeaderboardByCategory: async (_: any, { categoryId }: { categoryId: string }) => {
-      const scores = await Score.find({ categoryId })
-        .sort({ score: -1 })
-        .limit(100)
-        .populate('quizId')
-        .populate('userId');
+getLeaderboardByCategory: async (_: any, { categoryId }: { categoryId: string }) => {
+  const scores = await Score.find({ categoryId, quizId: null })
+    .sort({ score: -1 })
+    .limit(100)
+    .populate('quizId')
+    .populate('userId');
 
-      return scores.map((score: any) => {
-        const scoreObj = score.toObject();
-        return {
-          ...scoreObj,
-          userId: score.userId?._id || score.userId || null,
-          username: score.username || score.userId?.username || "Anonymous Player"
-        };
-      });
-    },
+  return scores.map((score: any) => {
+    const scoreObj = score.toObject();
+    return {
+      ...scoreObj,
+      userId: score.userId?._id || score.userId || null,
+      username: score.username || score.userId?.username || "Anonymous Player"
+    };
+  });
+},
 
     getUserHistory: async (_: any, { userId }: { userId: string }) => {
       const scores = await Score.find({ userId })
