@@ -273,3 +273,4 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
 };
 
 export default Quiz;
+//Filler2
