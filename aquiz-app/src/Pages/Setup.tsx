@@ -121,7 +121,7 @@ const Setup = ({ setQuizSettings }: SetupProps) => {
               <option value="easy">Easy</option>
               <option value="medium">Medium</option>
               <option value="hard">Hard</option>
-              <option value="">Any Difficulty</option>
+              <option value="">Random</option>
           </select>
         </div>
 
@@ -143,12 +143,12 @@ const Setup = ({ setQuizSettings }: SetupProps) => {
         </div>
 
         <div className='buttons'>
-          <button className="w-full max-w-[250px] py-4 mt-4 rounded-xl font-bold transition-all duration-300 backdrop-blur-md bg-electric-violet/20 border border-electric-violet/50 text-white hover:bg-electric-violet/40 hover:shadow-[0_0_15px_rgba(139,92,246,0.3)]" onClick={handleStart}>
+          <button className="w-full max-w-[250px] py-4 mt-4 rounded-xl font-bold transition-all duration-300 backdrop-blur-md bg-electric-violet/20 border border-electric-violet/50 text-white hover:bg-electric-violet/40 hover:shadow-[0_0_2px_rgba(139,92,246,0.3)]" onClick={handleStart}>
             Start Quiz
           </button>
           <div className="join-container" style={{ width: '250px', marginTop: '8px' }}>
             <button 
-               className="w-full py-4 rounded-xl font-bold transition-all duration-300 backdrop-blur-md bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20"
+               className="w-full Joinz py-4 rounded-xl font-bold transition-all duration-300 backdrop-blur-md bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20"
                onClick={() => setIsJoinVisible(!isJoinVisible)}
             >
                 {isJoinVisible ? 'Cancel' : 'Join Custom Quiz'}
@@ -189,7 +189,7 @@ const Setup = ({ setQuizSettings }: SetupProps) => {
                 </div>
             )}
           </div>
-          <button className="w-full max-w-[250px] py-4 mt-2 rounded-xl font-bold transition-all duration-300 backdrop-blur-md bg-electric-violet/20 border border-electric-violet/50 text-white hover:bg-electric-violet/40 hover:shadow-[0_0_15px_rgba(139,92,246,0.3)]" onClick={() => navigate('/')}>Home</button>
+          <button className="w-full max-w-[250px] py-4 mt-2 rounded-xl font-bold transition-all duration-300 backdrop-blur-md bg-electric-violet/20 border border-electric-violet/50 text-white hover:bg-electric-violet/40 hover:shadow-[0_0_2px_rgba(139,92,246,0.3)]" onClick={() => navigate('/')}>Home</button>
         </div>
       </div>
     </div>
