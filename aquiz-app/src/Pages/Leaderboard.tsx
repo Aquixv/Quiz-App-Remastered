@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import './Leaderboard.css';
-import { Quiz } from '../quiz';
+// import { Quiz } from '../quiz';
 import { gql } from '@apollo/client';
 import { useQuery } from '@apollo/client/react';
+
+interface Category {
+  id: number;
+  name: string;
+}
+
 const GET_CATEGORY_LEADERBOARD = gql`
   query GetLeaderboardByCategory($categoryId: String!) {
     getLeaderboardByCategory(categoryId: $categoryId) {
@@ -18,10 +24,10 @@ const GET_CATEGORY_LEADERBOARD = gql`
 const Leaderboard = () => {
     const location = useLocation();
     const [currentCategory, setCurrentCategory] = useState(location.state?.initialCategory || '9');
-    const [apiCategories, setApiCategories] = useState<Quiz[]>([]);
+    const [apiCategories, setApiCategories] = useState<Category[]>([]);
 
     const { data, loading } = useQuery<any>(GET_CATEGORY_LEADERBOARD, {
-        variables: { categoryId: currentCategory },
+        variables: { categoryId: String(currentCategory)},
         fetchPolicy: 'network-only',
     });
 
