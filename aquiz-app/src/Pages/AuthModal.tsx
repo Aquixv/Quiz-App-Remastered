@@ -23,6 +23,20 @@ interface RegisterResponse {
     username: string;
   };
 }
+interface ClaimResponse {
+claimer: {
+  _id:string;
+  totalPoints:number;
+}
+}
+const CLAIM_SCORES_MUTATION = gql`
+  mutation ClaimScores($scoreIds: [ID!]!) {
+    claimScores(scoreIds: $scoreIds) {
+      _id
+      totalPoints
+    }
+  }
+`;
 
 const LOGIN_MUTATION = gql`
   mutation Login($username: String!, $password: String!) {
@@ -52,7 +66,7 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess }: AuthModalProps) => {
 
   const [loginUser, { loading: loginLoading }] = useMutation<LoginResponse>(LOGIN_MUTATION);
   const [registerUser, { loading: registerLoading }] = useMutation<RegisterResponse>(REGISTER_MUTATION);
-
+  const [claimScores, { loading: claimScoresLoading }] = useMutation<RegisterResponse>(CLAIM_SCORES_MUTATION);
   if (!isOpen) return null;
 
   const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
@@ -70,6 +84,15 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess }: AuthModalProps) => {
         onAuthSuccess(user.username);
         onClose();
       }
+      const unclaimed = JSON.parse(localStorage.getItem('unclaimed_scores') || '[]');
+if (unclaimed.length > 0) {
+    try {
+        await claimScores({ variables: { scoreIds: unclaimed } });
+        localStorage.removeItem('unclaimed_scores');
+    } catch (claimErr) {
+        console.error("Failed to merge guest scores:", claimErr);
+    }
+}
     } else {
        await registerUser({ variables: formData });
       
