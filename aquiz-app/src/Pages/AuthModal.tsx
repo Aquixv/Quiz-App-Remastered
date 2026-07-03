@@ -74,43 +74,37 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess }: AuthModalProps) => {
     setError('');
 
     try {
-    if (isLogin) {
-      const { data } = await loginUser({ variables: formData });
-      if (data) {
-        const { token, user } = data.loginUser;
+      let loggedInUser = null;
+      if (isLogin) {
+        const { data } = await loginUser({ variables: formData });
+        if (data) loggedInUser = data.loginUser;
+      } else {
+        await registerUser({ variables: formData });
+        const { data } = await loginUser({ variables: formData });
+        if (data) loggedInUser = data.loginUser;
+      }
+      if (loggedInUser) {
+        const { token, user } = loggedInUser;
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify({ username: user.username, id: user._id }));
-        
+        const unclaimed = JSON.parse(localStorage.getItem('unclaimed_scores') || '[]');
+        if (unclaimed.length > 0) {
+            try {
+                await claimScores({ variables: { scoreIds: unclaimed } });
+                localStorage.removeItem('unclaimed_scores');
+                console.log("Guest scores successfully claimed!");
+            } catch (claimErr) {
+                console.error("Failed to merge guest scores:", claimErr);
+            }
+        }
         onAuthSuccess(user.username);
         onClose();
       }
-      const unclaimed = JSON.parse(localStorage.getItem('unclaimed_scores') || '[]');
-if (unclaimed.length > 0) {
-    try {
-        await claimScores({ variables: { scoreIds: unclaimed } });
-        localStorage.removeItem('unclaimed_scores');
-    } catch (claimErr) {
-        console.error("Failed to merge guest scores:", claimErr);
-    }
-}
-    } else {
-       await registerUser({ variables: formData });
       
-      const { data } = await loginUser({ variables: formData });
-      
-      if (data) {
-        const { token, user } = data.loginUser;
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify({ username: user.username, id: user._id }));
-        
-        onAuthSuccess(user.username);
-        onClose();
-      }
+    } catch (err: any) {
+      setError(err.message || 'Server connection failed');
     }
-  } catch (err: any) {
-    setError(err.message || 'Server connection failed');
-  }
-};
+  };
 
   const isProcessing = loginLoading || registerLoading;
 

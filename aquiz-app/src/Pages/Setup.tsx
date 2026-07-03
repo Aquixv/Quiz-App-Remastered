@@ -148,7 +148,7 @@ const Setup = ({ setQuizSettings }: SetupProps) => {
           </button>
           <div className="join-container" style={{ width: '250px', marginTop: '8px' }}>
             <button 
-               className="w-full Joinz py-4 rounded-xl font-bold transition-all duration-300 backdrop-blur-md bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20"
+               className="w-full max-w-[250px] py-4 rounded-xl font-bold transition-all duration-300 backdrop-blur-md bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20"
                onClick={() => setIsJoinVisible(!isJoinVisible)}
             >
                 {isJoinVisible ? 'Cancel' : 'Join Custom Quiz'}
