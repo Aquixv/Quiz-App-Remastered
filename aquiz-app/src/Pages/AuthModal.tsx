@@ -169,4 +169,3 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess }: AuthModalProps) => {
 };
 
 export default AuthModal;
-//Filler Again 
