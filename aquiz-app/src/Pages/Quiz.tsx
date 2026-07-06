@@ -172,7 +172,7 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
 
                 currentUnclaimed.push(mutationData.submitScore._id);
                 localStorage.setItem('unclaimed_scores', JSON.stringify(currentUnclaimed));
-                localStorage.setItem('user', JSON.stringify({ username: playerName }));
+                // localStorage.setItem('user', JSON.stringify({ username: playerName }));
             }
         } catch (err) {
             console.error("GraphQL mutation failed:", err);
