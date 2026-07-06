@@ -75,6 +75,7 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess }: AuthModalProps) => {
 
     try {
       let loggedInUser = null;
+
       if (isLogin) {
         const { data } = await loginUser({ variables: formData });
         if (data) loggedInUser = data.loginUser;
@@ -83,18 +84,30 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess }: AuthModalProps) => {
         const { data } = await loginUser({ variables: formData });
         if (data) loggedInUser = data.loginUser;
       }
+
       if (loggedInUser) {
         const { token, user } = loggedInUser;
+        
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify({ username: user.username, id: user._id }));
+
         const unclaimed = JSON.parse(localStorage.getItem('unclaimed_scores') || '[]');
+        
         if (unclaimed.length > 0) {
             try {
-                await claimScores({ variables: { scoreIds: unclaimed } });
-                localStorage.removeItem('unclaimed_scores');
+                console.log("Attempting to claim scores:", unclaimed);
+                await claimScores({ 
+                    variables: { scoreIds: unclaimed },
+                    context: {
+                        headers: {
+                            authorization: `Bearer ${token}`
+                        }
+                    }
+                });
+                localStorage.removeItem('unclaimed_scores'); 
                 console.log("Guest scores successfully claimed!");
             } catch (claimErr) {
-                console.error("Failed to merge guest scores:", claimErr);
+                console.error("Failed to merge guest scores (Backend rejected):", claimErr);
             }
         }
         onAuthSuccess(user.username);
