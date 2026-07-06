@@ -19,13 +19,18 @@ interface QuestionData {
     questionText?: string;
     correctAnswer?: string;
     incorrectAnswers?: string[];
+    submitScore?:number;
 }
 
 interface QuizLocationState {
     customQuiz?: QuestionData[];
     quizId?: string;
 }
-
+interface SubmitScoreResponse {
+  submitScore: {
+    _id: string;
+  };
+}
 interface QuizProps {
     category: string;
     amount: number;
@@ -72,7 +77,7 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
     const [needsNamePrompt, setNeedsNamePrompt] = useState(false);
     const [scoreSaved, setScoreSaved] = useState(false);
 
-    const [submitScore] = useMutation(SUBMIT_SCORE_MUTATION);
+    const [submitScore] = useMutation<SubmitScoreResponse>(SUBMIT_SCORE_MUTATION);
 
     const Option1 = useRef<HTMLLIElement>(null);
     const Option2 = useRef<HTMLLIElement>(null);
@@ -146,9 +151,9 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
             setLock(true);
         }
     };
-    const executeScoreSubmission = async (playerName: string, playerId: string | null = null) => {
+   const executeScoreSubmission = async (playerName: string, playerId: string | null = null) => {
         try {
-            await submitScore({
+                const { data: mutationData } = await submitScore({
                 variables: {
                     userId: playerId, 
                     username: playerName, 
@@ -158,18 +163,21 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
                     totalQuestions: data.length
                 }
             });
+            
             console.log("🏆 Score logged via GraphQL!");
             setScoreSaved(true);
             setNeedsNamePrompt(false);
-            
-            if (!playerId) {
+            if (!playerId && mutationData?.submitScore?._id) {
+                const currentUnclaimed = JSON.parse(localStorage.getItem('unclaimed_scores') || '[]');
+
+                currentUnclaimed.push(mutationData.submitScore._id);
+                localStorage.setItem('unclaimed_scores', JSON.stringify(currentUnclaimed));
                 localStorage.setItem('user', JSON.stringify({ username: playerName }));
             }
         } catch (err) {
             console.error("GraphQL mutation failed:", err);
         }
     };
-
     const next1 = () => {
         if (lock) {
             if (index === data.length - 1) {
