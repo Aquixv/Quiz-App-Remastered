@@ -281,4 +281,3 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
 };
 
 export default Quiz;
-//Fill again smh
