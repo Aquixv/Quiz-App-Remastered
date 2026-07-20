@@ -215,7 +215,7 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
         return { msg: "", color: "#ff4a4a", gif: speed };
     };
 
-    if (loading) return <div className='container'><h2>Loading Questions...</h2></div>;
+    if (loading) return <div className='container' style={{ backgroundColor: '#8b5cf6' }}><h2>Loading Questions...</h2></div>;
 
     const feedback = getFeedback();
 
