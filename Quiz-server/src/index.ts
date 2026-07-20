@@ -25,8 +25,10 @@ const startServer = async () => {
     console.log('📦 Connected to MongoDB!');
 
     const { url } = await startStandaloneServer(server, {
-      listen: { port: 4000 },
-      
+      listen: { 
+        port: Number(process.env.PORT) || 4000,
+        host: '0.0.0.0'
+      },
       context: async ({ req }): Promise<MyContext> => {
         const authHeader = req.headers.authorization || '';
         const token = authHeader.replace('Bearer ', '');
