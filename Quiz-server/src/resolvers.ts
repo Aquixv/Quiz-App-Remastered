@@ -4,7 +4,8 @@ import User from "../models/User";
 import Quiz from "../models/Quiz"; 
 import Score from "../models/Score";
 import { GraphQLError } from 'graphql';
-import { MyContext } from './index'; 
+import { MyContext } from './index';
+import mongoose from "mongoose"; 
 
 interface RegisterArgs {
   username: string;
@@ -56,7 +57,13 @@ export const resolvers = {
     };
   });
 },
-
+healthCheck: () => {
+      if (mongoose.connection.readyState === 1) {
+        return "Server and Database are healthy! 🚀";
+      } else {
+        throw new Error("Server is up, but Database is disconnected.");
+      }
+    },
 getLeaderboardByCategory: async (_: any, { categoryId }: { categoryId: string }) => {
   const scores = await Score.find({ categoryId, quizId: null })
     .sort({ score: -1 })
