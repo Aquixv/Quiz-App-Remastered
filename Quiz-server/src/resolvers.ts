@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
 import * as jwt from 'jsonwebtoken'
-import User from "../models/User";
-import Quiz from "../models/Quiz"; 
-import Score from "../models/Score";
+import User from "./models/User";
+import Quiz from "./models/Quiz"; 
+import Score from "./models/Score";
 import { GraphQLError } from 'graphql';
 import { MyContext } from './index';
 import mongoose from "mongoose"; 
