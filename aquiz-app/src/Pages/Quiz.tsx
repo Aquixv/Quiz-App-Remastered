@@ -215,14 +215,14 @@ const Quiz = ({ category, amount, difficulty }: QuizProps) => {
         return { msg: "", color: "#ff4a4a", gif: speed };
     };
 
-    if (loading) return <div className='container' style={{ backgroundColor: '#8b5cf6' }}><h2>Loading Questions...</h2></div>;
+    if (loading) return <div className='container' style={{ backgroundColor: '#1a0b2e' }}><h2>Loading Questions...</h2></div>;
 
     const feedback = getFeedback();
 
     return (
-        <div className='container'>
+        <div className='container' style={{ backgroundColor: '#1a0b2e' }}>
             {result ? (
-                <div className="result-container">
+                <div className="result-container" style={{ backgroundColor: '#1a0b2e' }}>
                     <img src={feedback.gif} alt="Reaction" className="result-gif" />
                     <h2 style={{ color: feedback.color }}>{feedback.msg}</h2>
                     <h3 style={{display:'flex', alignItems:'center', gap:'10px'}}>{score*10} Points!</h3>
