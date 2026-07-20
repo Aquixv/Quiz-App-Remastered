@@ -43,7 +43,7 @@ type Quiz {
   getLeaderboard: [Score]
   getLeaderboardByCategory(categoryId: String!): [Score]
   getUserHistory(userId: ID!): [Score]
-  HealthCheck:String!
+  healthCheck:String!
   }
 type AuthPayload {
   token: String!
