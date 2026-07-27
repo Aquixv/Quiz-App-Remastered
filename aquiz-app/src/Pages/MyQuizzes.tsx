@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { Quiz } from '../quiz';
+import CustomLeaderboard from './CustomQuizLB';
 
 interface DeltQuiz {
   deleteQuiz: boolean;
@@ -97,7 +98,7 @@ const MyQuizzes = () => {
                     quizzes.map(quiz => (
                         <div key={quiz._id} className="glass-card p-5 rounded-2xl border border-white/10 flex justify-between items-center bg-white/5">
                             <div>
-                                <h3 className="font-bold text-white text-lg">{quiz.quizTitle}</h3>
+                                <h3 onClick= {() => navigate('/CustomQuiz')}  className="font-bold text-white text-lg">{quiz.quizTitle}</h3>
                                 <p className="text-xs text-lavender-light/40 mt-1">
                                     CODE: <span onClick={() => copyToClipboard(quiz.joinCode)} className="text-neon-yellow font-mono font-bold tracking-widest uppercase cursor-pointer hover:underline">{quiz.joinCode}</span>
                                 </p>
