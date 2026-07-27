@@ -80,19 +80,15 @@ interface HistoryResponse {
 
 const Profile = () => {
   const navigate = useNavigate();
-  
-  //  Auth variables
+
   const userString = localStorage.getItem('user');
   const localUser = userString ? JSON.parse(userString) : null;
   const userId = localUser?.id || localUser?._id;
-
-  // 3. Fire profile data query
   const { data: profileData, loading: profileLoading } = useQuery<ProfileResponse>(FETCH_PROFILE, {
     variables: { getUserId: userId },
     skip: !userId, 
   });
 
-  // 4. Fire match history data query
   const { data: historyData, loading: historyLoading } = useQuery<HistoryResponse>(FETCH_USER_HISTORY, {
     variables: { userId: userId },
     skip: !userId,
