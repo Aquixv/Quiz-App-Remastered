@@ -8,6 +8,7 @@ import Leaderboard from './Pages/Leaderboard';
 import Profile from './Pages/Profile';
 import MyQuizzes from './Pages/MyQuizzes';
 import MyHistory from './Pages/History';
+import CustomLeaderboard from './Pages/CustomQuizLB';
 
 export interface QuizSettingsState {
   amount: number;
@@ -32,7 +33,8 @@ const App = () => {
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/myquizzes" element={<MyQuizzes />} />
-        <Route path='/history' element={<MyHistory />}></Route>
+        <Route path='/history' element={<MyHistory />}/>
+        <Route path= '/CustomQuiz' element={<CustomLeaderboard />} />
       </Routes>
     </BrowserRouter>
   );
