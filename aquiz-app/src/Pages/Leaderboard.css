@@ -14,3 +14,9 @@
   background-color: #1a0b2e;
   color: #e9d5ff;
 }
+.pvx{
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+}
