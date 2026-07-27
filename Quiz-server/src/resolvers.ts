@@ -95,7 +95,22 @@ getLeaderboardByCategory: async (_: any, { categoryId }: { categoryId: string })
           username: score.username || score.userId?.username || "Anonymous Player"
         };
       });
-    }
+    },
+    getCustomQuizLeaderboard: async (_: any, { quizId }: { quizId: string }) => {
+  const scores = await Score.find({ quizId })
+    .sort({ score: -1 })
+    .limit(50)
+    .populate('userId');
+
+  return scores.map((score: any) => {
+    const scoreObj = score.toObject();
+    return {
+     scoreObj,
+      userId: score.userId?._id || score.userId || null,
+      username: score.username || score.userId?.username || "Anonymous Player"
+    };
+  });
+},
   },
   Mutation: {
     registerUser: async (_: unknown, { username, password }: RegisterArgs) => {
