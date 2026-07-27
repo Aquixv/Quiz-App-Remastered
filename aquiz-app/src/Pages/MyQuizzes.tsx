@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { Quiz } from '../quiz';
-import CustomLeaderboard from './CustomQuizLB';
 
 interface DeltQuiz {
   deleteQuiz: boolean;
