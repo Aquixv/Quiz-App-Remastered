@@ -59,6 +59,8 @@ interface ProfileResponse {
   getUser: {
     username: string;
     totalPoints: number;
+   calculatedTotalPoints: number;
+
   };
 }
 
@@ -128,7 +130,8 @@ const Profile = () => {
 
   const userStats = profileData?.getUser;
   const matchHistory = historyData?.getUserHistory || [];
-  const rank = getPlayerRankInfo(userStats?.totalPoints || 0);
+  const calculatedTotalPoints = matchHistory.reduce((sum, match) => sum + match.score, 0);
+  const rank = getPlayerRankInfo(userStats?.calculatedTotalPoints || 0);
 
   const handleLogout = () => {
     localStorage.removeItem('token'); 
@@ -160,7 +163,7 @@ const Profile = () => {
 
         <div className="grid grid-cols-2 gap-4 mb-8">
           <div className="glass-card p-6 rounded-3xl text-center border border-white/5">
-            <span className="text-electric-violet text-3xl font-black block">{userStats.totalPoints.toLocaleString()}</span>
+            <span className="text-electric-violet text-3xl font-black block">{userStats.calculatedTotalPoints.toLocaleString()}</span>
             <span className="text-[10px] uppercase font-bold tracking-widest opacity-50">Total Points</span>
           </div>
           <div className="glass-card p-6 rounded-3xl text-center border border-white/5">

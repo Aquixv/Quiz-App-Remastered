@@ -34,7 +34,7 @@ const App = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/myquizzes" element={<MyQuizzes />} />
         <Route path='/history' element={<MyHistory />}/>
-        <Route path= '/CustomQuiz' element={<CustomLeaderboard />} />
+        <Route path= '/CustomQuiz/:quizId' element={<CustomLeaderboard />} />
       </Routes>
     </BrowserRouter>
   );

@@ -27,7 +27,7 @@ const startServer = async () => {
     const { url } = await startStandaloneServer(server, {
       listen: { 
         port: Number(process.env.PORT) || 4000,
-        host: '0.0.0.0'
+        // host: '0.0.0.0'
       },
       context: async ({ req }): Promise<MyContext> => {
         const authHeader = req.headers.authorization || '';
