@@ -32,9 +32,14 @@ export const resolvers = {
     getUser: async (_: unknown, { id }: { id: string }) => {
       return await User.findById(id);
     },
-    getQuizzes: async () => {
-      return await Quiz.find({}).sort({ createdAt: -1 });
-    },
+    getQuizzes: async (_: any, __: any, context: MyContext) => {
+  if (!context.user) {
+    throw new Error("You must be logged in to view quizzes.");
+  }
+  const myQuizzes = await Quiz.find({ creatorId: context.user.userId });
+  
+  return myQuizzes;
+},
     getQuiz: async (_: any, { id }: { id: string }) => {
       return await Quiz.findById(id);
     },

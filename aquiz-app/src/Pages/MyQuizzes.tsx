@@ -42,7 +42,7 @@ const MyQuizzes = () => {
     const { data, loading: queryLoading, error } = useQuery<QuizResponse>(QUERY_FETCHQUIZ, {
         fetchPolicy: 'network-only'
     });
-
+    console.log("Apollo Error:", error);
     const [deleteQuiz] = useMutation<DeltQuiz>(DELETE_QUIZ_MUTATION);
     useEffect(() => {
         if (!userId) {
