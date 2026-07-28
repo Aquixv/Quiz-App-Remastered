@@ -29,7 +29,7 @@ const CustomLeaderboard = () => {
         variables: { quizId },
         fetchPolicy: 'network-only',
     });
-
+    console.log("Apollo Error:", error);
     if (loading) return <div className="text-white text-center mt-20">Loading...</div>;
     if (error) return <div className="text-red-400 text-center mt-20">Failed to load leaderboard.</div>;
 

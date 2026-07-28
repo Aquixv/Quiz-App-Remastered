@@ -110,7 +110,7 @@ getLeaderboardByCategory: async (_: any, { categoryId }: { categoryId: string })
   return scores.map((score: any) => {
     const scoreObj = score.toObject();
     return {
-     scoreObj,
+     ...scoreObj,
       userId: score.userId?._id || score.userId || null,
       username: score.username || score.userId?.username || "Anonymous Player"
     };
