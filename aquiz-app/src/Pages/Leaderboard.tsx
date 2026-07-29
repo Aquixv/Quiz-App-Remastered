@@ -55,15 +55,13 @@ const Leaderboard = () => {
         return Array.from(userMap.values()).sort((a, b) => b.score - a.score);
     };
 
-    // 1. Properly filter and slice the data
     const displayScores = getUniqueTopScores(data?.getLeaderboardByCategory);
     const topThree = displayScores.slice(0, 3);
-    const remainingPlayers = displayScores.slice(3, 10); // Grabs 4th through 10th place
+    const remainingPlayers = displayScores.slice(3, 10);
 
     return (
         <div className="bg-deep-purple min-h-screen p-6 text-lavender-light pb-32">
             
-            {/* Category Selector */}
             <select 
                 className="quiz-select-dark mb-8 w-full mt-8"
                 value={currentCategory}
@@ -73,17 +71,13 @@ const Leaderboard = () => {
                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                 ))}
             </select>
-
-            {/* Loading / Data / Empty State Handling */}
             {loading ? (
                 <div className="text-center py-20 opacity-50 animate-pulse">
                     Loading Rankings...
                 </div>
             ) : displayScores.length > 0 ? (
                 <div className="space-y-8">
-                    {/* Podium Section */}
                     <div className="flex justify-center items-end gap-4 mt-8">
-                        {/* 2nd Place */}
                         {topThree[1] && (
                             <div className="flex flex-col items-center">
                                 <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${topThree[1].username}`} className="size-12 rounded-full mb-2 z-10 bg-white/10" alt="2nd" />
@@ -93,8 +87,6 @@ const Leaderboard = () => {
                                 </div>
                             </div>
                         )}
-
-                        {/* 1st Place */}
                         {topThree[0] && (
                             <div className="flex flex-col items-center">
                                 <span className="text-3xl mb-1">👑</span>
@@ -105,8 +97,6 @@ const Leaderboard = () => {
                                 </div>
                             </div>
                         )}
-
-                        {/* 3rd Place */}
                         {topThree[2] && (
                             <div className="flex flex-col items-center">
                                 <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${topThree[2].username}`} className="size-12 rounded-full mb-2 z-10 bg-white/10" alt="3rd" />
@@ -118,9 +108,8 @@ const Leaderboard = () => {
                         )}
                     </div>
 
-                    {/* Remaining Top 10 List */}
                     {remainingPlayers.length > 0 && (
-                        <div className="w-full max-w-2xl mx-auto space-y-2 bg-white/5 p-4 rounded-3xl border border-glass-border shadow-lg">
+                        <div>
                             {remainingPlayers.map((player, index) => (
                                 <div key={player._id} className="flex items-center justify-between p-3 bg-white/5 hover:bg-white/10 transition-colors rounded-xl border border-white/5">
                                     <div className="flex items-center gap-4">
@@ -143,8 +132,6 @@ const Leaderboard = () => {
                     <p>No one has conquered this category yet.</p>
                 </div>
             )}
-
-            {/* Bottom Navigation */}
             <nav className="fixed bottom-0 left-0 right-0 bg-deep-purple/80 backdrop-blur-xl border-t border-glass-border px-4 pb-6 pt-2 z-20">
                 <div className="flex justify-around">
                     <Link to="/" className="flex flex-col items-center gap-1 text-lavender-light/40 hover:text-neon-yellow transition-colors">
