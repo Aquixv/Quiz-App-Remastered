@@ -3,6 +3,7 @@ import { useLocation, Link } from 'react-router-dom';
 import './Leaderboard.css';
 import { gql } from '@apollo/client';
 import { useQuery } from '@apollo/client/react';
+import { useNavigate } from 'react-router-dom';
 
 interface Category {
   id: number;
@@ -13,15 +14,16 @@ const GET_CATEGORY_LEADERBOARD = gql`
   query GetLeaderboardByCategory($categoryId: String!) {
     getLeaderboardByCategory(categoryId: $categoryId) {
       _id
+      userId
       username
       score
       totalQuestions
     }
   }
 `;
-
 const Leaderboard = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const [currentCategory, setCurrentCategory] = useState(location.state?.initialCategory || '9');
     const [apiCategories, setApiCategories] = useState<Category[]>([]);
 
@@ -80,8 +82,10 @@ const Leaderboard = () => {
                     <div className="flex justify-center items-end gap-4 mt-8">
                         {topThree[1] && (
                             <div className="flex flex-col items-center">
-                                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${topThree[1].username}`} className="size-12 rounded-full mb-2 z-10 bg-white/10" alt="2nd" />
+                                <img onClick={() => navigate(`/userprofile/${topThree[1].userId}`)} src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${topThree[1].username}`} className="size-12 rounded-full mb-2 z-10 bg-white/10" alt="2nd" />
                                 <span className="font-bold text-white bg-white/20 px-2 rounded-md mb-2 text-sm">{topThree[1].username}</span>
+                                <span className="text-[10px] text-lavender-light/50 uppercase tracking-wider">{topThree[1].totalQuestions} Questions</span>
+                                            <span className="font-black text-neon-yellow text-lg">{topThree[1].score} pts</span>
                                 <div className="w-24 h-32 bg-gradient-to-t from-cyan-600 to-cyan-400 rounded-t-xl flex justify-center pt-4 shadow-[0_0_15px_rgba(34,211,238,0.5)]">
                                     <span className="text-5xl font-black text-white/30">2</span>
                                 </div>
@@ -90,8 +94,10 @@ const Leaderboard = () => {
                         {topThree[0] && (
                             <div className="flex flex-col items-center">
                                 <span className="text-3xl mb-1">👑</span>
-                                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${topThree[0].username}`} className="size-16 rounded-full mb-2 z-10 border-4 border-yellow-400 bg-white/10" alt="1st" />
+                                <img onClick={() => navigate(`/userprofile/${topThree[0].UserId}`)} src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${topThree[0].username}`} className="size-16 rounded-full mb-2 z-10 border-4 border-yellow-400 bg-white/10" alt="1st" />
                                 <span className="font-bold text-white bg-white/20 px-2 rounded-md mb-2">{topThree[0].username}</span>
+                                <span className="text-[10px] text-lavender-light/50 uppercase tracking-wider">{topThree[0].totalQuestions} Questions</span>
+                                            <span className="font-black text-neon-yellow text-lg">{topThree[0].score} pts</span>
                                 <div className="w-28 h-44 bg-gradient-to-t from-yellow-600 to-yellow-400 rounded-t-xl flex justify-center pt-4 shadow-[0_0_20px_rgba(250,204,21,0.6)] z-0 relative">
                                     <span className="text-6xl font-black text-white/30">1</span>
                                 </div>
@@ -99,8 +105,10 @@ const Leaderboard = () => {
                         )}
                         {topThree[2] && (
                             <div className="flex flex-col items-center">
-                                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${topThree[2].username}`} className="size-12 rounded-full mb-2 z-10 bg-white/10" alt="3rd" />
+                                <img onClick={() => navigate(`/userprofile/${topThree[2].userId}`)} src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${topThree[2].username}`} className="size-12 rounded-full mb-2 z-10 bg-white/10" alt="3rd" />
                                 <span className="font-bold text-white bg-white/20 px-2 rounded-md mb-2 text-sm">{topThree[2].username}</span>
+                                            <span className="text-[10px] text-lavender-light/50 uppercase tracking-wider">{topThree[2].totalQuestions} Questions</span>
+                                            <span className="font-black text-neon-yellow text-lg">{topThree[2].score} pts</span>
                                 <div className="w-24 h-24 bg-gradient-to-t from-fuchsia-600 to-fuchsia-400 rounded-t-xl flex justify-center pt-4 shadow-[0_0_15px_rgba(217,70,239,0.5)]">
                                     <span className="text-5xl font-black text-white/30">3</span>
                                 </div>
@@ -114,7 +122,7 @@ const Leaderboard = () => {
                                 <div key={player._id} className="flex items-center justify-between p-3 bg-white/5 hover:bg-white/10 transition-colors rounded-xl border border-white/5">
                                     <div className="flex items-center gap-4">
                                         <span className="font-bold text-white/50 w-6 text-center">{index + 4}</span> 
-                                        <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${player.username}`} className="size-10 rounded-full bg-electric-violet/20" alt="avatar" />
+                                        <img onClick={() => navigate(`/userprofile/${player.UserId}`)} src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${player.username}`} className="size-10 rounded-full bg-electric-violet/20" alt="avatar" />
                                         <div>
                                             <span className="font-bold text-white block">@{player.username}</span>
                                             <span className="text-[10px] text-lavender-light/50 uppercase tracking-wider">{player.totalQuestions} Questions</span>
