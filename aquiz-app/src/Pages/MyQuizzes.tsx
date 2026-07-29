@@ -81,7 +81,7 @@ const MyQuizzes = () => {
             <header className="flex items-center mb-8">
                 <button 
                     onClick={() => navigate('/profile')} 
-                    className="material-symbols-outlined mr-4 hover:text-white transition-colors"
+                    className="material-symbols-outlined mr-4 hover:text-neon-yellow transition-colors"
                 >
                     arrow_back
                 </button>
@@ -95,9 +95,9 @@ const MyQuizzes = () => {
                     <div className="text-center py-20 text-red-400">Failed to sync with the server.</div>
                 ) : quizzes.length > 0 ? (
                     quizzes.map(quiz => (
-                        <div key={quiz._id} className="glass-card p-5 rounded-2xl border border-white/10 flex justify-between items-center bg-white/5">
+                        <div onClick={() => navigate(`/CustomQuiz/${quiz._id}`)} key={quiz._id} className="glass-card p-5 rounded-2xl border border-white/10 flex justify-between items-center bg-white/5">
                             <div>
-                                <h3 onClick={() => navigate(`/CustomQuiz/${quiz._id}`)}  className="font-bold text-white text-lg">{quiz.quizTitle}</h3>
+                                <h3 className="font-bold text-white text-lg">{quiz.quizTitle}</h3>
                                 <p className="text-xs text-lavender-light/40 mt-1">
                                     CODE: <span onClick={() => copyToClipboard(quiz.joinCode)} className="text-neon-yellow font-mono font-bold tracking-widest uppercase cursor-pointer hover:underline">{quiz.joinCode}</span>
                                 </p>

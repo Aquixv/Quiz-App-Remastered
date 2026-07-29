@@ -69,7 +69,7 @@ const MyHistory = () => {
             <header className="flex items-center mb-8">
                 <button 
                     onClick={() => navigate('/profile')} 
-                    className="material-symbols-outlined mr-4 hover:text-white transition-colors"
+                    className="material-symbols-outlined mr-4 hover:text-neon-yellow transition-colors"
                 >
                     arrow_back
                 </button>

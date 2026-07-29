@@ -117,7 +117,7 @@ const CreateQuiz = () => {
     <div className="bg-deep-purple min-h-screen p-6 text-lavender-light font-display pb-32">
       <button 
           onClick={() => navigate('/myquizzes')} 
-          className="material-symbols-outlined mr-4 hover:text-white transition-colors"
+          className="material-symbols-outlined mr-4 hover:text-neon-yellow transition-colors"
       >
           arrow_back
       </button>
