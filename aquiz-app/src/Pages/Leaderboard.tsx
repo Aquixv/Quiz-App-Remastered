@@ -94,7 +94,7 @@ const Leaderboard = () => {
                         {topThree[0] && (
                             <div className="flex flex-col items-center">
                                 <span className="text-3xl mb-1">👑</span>
-                                <img onClick={() => navigate(`/userprofile/${topThree[0].UserId}`)} src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${topThree[0].username}`} className="size-16 rounded-full mb-2 z-10 border-4 border-yellow-400 bg-white/10" alt="1st" />
+                                <img onClick={() => navigate(`/userprofile/${topThree[0].userId}`)} src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${topThree[0].username}`} className="size-16 rounded-full mb-2 z-10 border-4 border-yellow-400 bg-white/10" alt="1st" />
                                 <span className="font-bold text-white bg-white/20 px-2 rounded-md mb-2">{topThree[0].username}</span>
                                 <span className="text-[10px] text-lavender-light/50 uppercase tracking-wider">{topThree[0].totalQuestions} Questions</span>
                                             <span className="font-black text-neon-yellow text-lg">{topThree[0].score} pts</span>
